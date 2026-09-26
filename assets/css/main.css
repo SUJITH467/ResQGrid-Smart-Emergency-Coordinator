@@ -1,0 +1,521 @@
+/* =============================================================================
+   main.css
+   Design tokens, CSS reset, and layout skeleton for ResQGrid.
+   All other stylesheets import tokens from here via cascade.
+   ============================================================================= */
+
+/* ── Design Tokens ──────────────────────────────────────────────────────────── */
+:root {
+  /* Brand colours */
+  --resq-color-brand-primary:    #1d4ed8;   /* Blue 700 */
+  --resq-color-brand-secondary:  #1e40af;   /* Blue 800 */
+  --resq-color-brand-accent:     #3b82f6;   /* Blue 500 */
+
+  /* Priority colours */
+  --resq-color-critical:         #dc2626;   /* Red 600 */
+  --resq-color-critical-bg:      #fef2f2;   /* Red 50 */
+  --resq-color-critical-border:  #fca5a5;   /* Red 300 */
+  --resq-color-high:             #ea580c;   /* Orange 600 */
+  --resq-color-high-bg:          #fff7ed;
+  --resq-color-high-border:      #fdba74;
+  --resq-color-medium:           #ca8a04;   /* Yellow 600 */
+  --resq-color-medium-bg:        #fefce8;
+  --resq-color-medium-border:    #fde047;
+  --resq-color-low:              #2563eb;   /* Blue 600 */
+  --resq-color-low-bg:           #eff6ff;
+  --resq-color-low-border:       #93c5fd;
+
+  /* Incident status colours */
+  --resq-color-status-reported:       #6b7280;  /* Grey 500 */
+  --resq-color-status-reported-bg:    #f9fafb;
+  --resq-color-status-active:         #2563eb;  /* Blue 600 */
+  --resq-color-status-active-bg:      #eff6ff;
+  --resq-color-status-inprogress:     #d97706;  /* Amber 600 */
+  --resq-color-status-inprogress-bg:  #fffbeb;
+  --resq-color-status-resolved:       #16a34a;  /* Green 600 */
+  --resq-color-status-resolved-bg:    #f0fdf4;
+
+  /* Resource status colours */
+  --resq-color-status-available:      #16a34a;  /* Green 600 */
+  --resq-color-status-available-bg:   #f0fdf4;
+  --resq-color-status-deployed:       #2563eb;  /* Blue 600 */
+  --resq-color-status-deployed-bg:    #eff6ff;
+  --resq-color-status-maintenance:    #d97706;  /* Amber 600 */
+  --resq-color-status-maintenance-bg: #fffbeb;
+
+  /* Incident type colours (for statistics bars) */
+  --resq-color-type-fire:        #dc2626;
+  --resq-color-type-medical:     #2563eb;
+  --resq-color-type-security:    #7c3aed;   /* Violet 600 */
+  --resq-color-type-hazmat:      #65a30d;   /* Lime 600 */
+  --resq-color-type-natural:     #0891b2;   /* Cyan 600 */
+  --resq-color-type-other:       #6b7280;   /* Grey 500 */
+
+  /* UI state colours */
+  --resq-color-success:          #16a34a;
+  --resq-color-success-bg:       #f0fdf4;
+  --resq-color-warning:          #d97706;
+  --resq-color-warning-bg:       #fffbeb;
+  --resq-color-error:            #dc2626;
+  --resq-color-error-bg:         #fef2f2;
+  --resq-color-info:             #0284c7;   /* Sky 600 */
+  --resq-color-info-bg:          #f0f9ff;
+
+  /* Neutral palette */
+  --resq-color-white:            #ffffff;
+  --resq-color-bg:               #f1f5f9;   /* Slate 100 */
+  --resq-color-surface:          #ffffff;
+  --resq-color-surface-raised:   #f8fafc;   /* Slate 50 */
+  --resq-color-border:           #e2e8f0;   /* Slate 200 */
+  --resq-color-border-strong:    #cbd5e1;   /* Slate 300 */
+  --resq-color-text:             #0f172a;   /* Slate 900 */
+  --resq-color-text-secondary:   #475569;   /* Slate 600 */
+  --resq-color-text-muted:       #94a3b8;   /* Slate 400 */
+  --resq-color-text-inverse:     #f8fafc;
+
+  /* Sidebar */
+  --resq-color-sidebar-bg:       #0f172a;   /* Slate 900 */
+  --resq-color-sidebar-text:     #cbd5e1;   /* Slate 300 */
+  --resq-color-sidebar-hover:    #1e293b;   /* Slate 800 */
+  --resq-color-sidebar-active:   #1d4ed8;   /* Blue 700 */
+  --resq-color-sidebar-border:   #1e293b;
+
+  /* Typography */
+  --resq-font-sans:    system-ui, -apple-system, 'Segoe UI', Roboto,
+                       'Helvetica Neue', Arial, sans-serif;
+  --resq-font-mono:    'JetBrains Mono', 'Fira Code', 'Cascadia Code',
+                       'Courier New', monospace;
+  --resq-font-size-xs:  0.75rem;   /*  12px */
+  --resq-font-size-sm:  0.875rem;  /*  14px */
+  --resq-font-size-md:  1rem;      /*  16px */
+  --resq-font-size-lg:  1.125rem;  /*  18px */
+  --resq-font-size-xl:  1.25rem;   /*  20px */
+  --resq-font-size-2xl: 1.5rem;    /*  24px */
+  --resq-font-size-3xl: 1.875rem;  /*  30px */
+  --resq-font-size-4xl: 2.25rem;   /*  36px */
+  --resq-font-weight-normal:  400;
+  --resq-font-weight-medium:  500;
+  --resq-font-weight-semibold: 600;
+  --resq-font-weight-bold:    700;
+  --resq-line-height-tight:  1.25;
+  --resq-line-height-normal: 1.5;
+  --resq-line-height-loose:  1.75;
+
+  /* Spacing scale (multiples of 4px) */
+  --resq-space-1:   0.25rem;  /*  4px */
+  --resq-space-2:   0.5rem;   /*  8px */
+  --resq-space-3:   0.75rem;  /* 12px */
+  --resq-space-4:   1rem;     /* 16px */
+  --resq-space-5:   1.25rem;  /* 20px */
+  --resq-space-6:   1.5rem;   /* 24px */
+  --resq-space-8:   2rem;     /* 32px */
+  --resq-space-10:  2.5rem;   /* 40px */
+  --resq-space-12:  3rem;     /* 48px */
+  --resq-space-16:  4rem;     /* 64px */
+
+  /* Border radius */
+  --resq-radius-sm:   0.25rem;  /*  4px */
+  --resq-radius-md:   0.5rem;   /*  8px */
+  --resq-radius-lg:   0.75rem;  /* 12px */
+  --resq-radius-xl:   1rem;     /* 16px */
+  --resq-radius-full: 9999px;
+
+  /* Shadows */
+  --resq-shadow-sm:  0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --resq-shadow-md:  0 4px 6px -1px rgb(0 0 0 / 0.1),
+                     0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --resq-shadow-lg:  0 10px 15px -3px rgb(0 0 0 / 0.1),
+                     0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --resq-shadow-xl:  0 20px 25px -5px rgb(0 0 0 / 0.1),
+                     0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+  /* Layout dimensions */
+  --resq-sidebar-width:         240px;
+  --resq-sidebar-width-mobile:  0px;
+  --resq-topbar-height:         60px;
+  --resq-content-max-width:     1280px;
+
+  /* Transitions */
+  --resq-transition-fast:   150ms ease;
+  --resq-transition-normal: 250ms ease;
+  --resq-transition-slow:   350ms ease;
+
+  /* Z-index scale */
+  --resq-z-sidebar:  100;
+  --resq-z-overlay:  200;
+  --resq-z-modal:    300;
+  --resq-z-toast:    400;
+}
+
+/* ── CSS Reset ──────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin:     0;
+  padding:    0;
+}
+
+html {
+  font-size:               16px;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior:          smooth;
+}
+
+body {
+  font-family:   var(--resq-font-sans);
+  font-size:     var(--resq-font-size-md);
+  line-height:   var(--resq-line-height-normal);
+  color:         var(--resq-color-text);
+  background:    var(--resq-color-bg);
+  min-height:    100vh;
+  overflow-x:    hidden;
+}
+
+/* Remove list styles only on elements explicitly marked as lists */
+ul[role="list"],
+ol[role="list"] {
+  list-style: none;
+}
+
+/* Improve media defaults */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* Inherit fonts for form elements */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/* Ensure headings do not overflow */
+h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+  line-height:   var(--resq-line-height-tight);
+}
+
+p, li {
+  overflow-wrap: break-word;
+}
+
+/* Remove default button styles — re-apply in components.css */
+button {
+  border:     none;
+  background: none;
+  cursor:     pointer;
+}
+
+/* Anchor reset */
+a {
+  color:           inherit;
+  text-decoration: none;
+}
+
+/* ── Focus styles ───────────────────────────────────────────────────────────── */
+/* Visible focus ring for all interactive elements — accessibility requirement */
+:focus-visible {
+  outline:        2px solid var(--resq-color-brand-accent);
+  outline-offset: 2px;
+  border-radius:  var(--resq-radius-sm);
+}
+
+/* Remove focus ring for mouse users (browsers that support :focus-visible) */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ── App Layout ─────────────────────────────────────────────────────────────── */
+/*
+ * Layout: Sidebar (fixed left) + Main content area (scrollable)
+ *
+ * [sidebar] | [topbar          ]
+ *           | [main content    ]
+ */
+
+.app-layout {
+  display:   flex;
+  min-height: 100vh;
+}
+
+/* ── Sidebar ────────────────────────────────────────────────────────────────── */
+.sidebar {
+  position:    fixed;
+  top:         0;
+  left:        0;
+  width:       var(--resq-sidebar-width);
+  height:      100vh;
+  background:  var(--resq-color-sidebar-bg);
+  color:       var(--resq-color-sidebar-text);
+  display:     flex;
+  flex-direction: column;
+  z-index:     var(--resq-z-sidebar);
+  overflow-y:  auto;
+  overflow-x:  hidden;
+  border-right: 1px solid var(--resq-color-sidebar-border);
+  transition:  transform var(--resq-transition-normal);
+}
+
+.sidebar__brand {
+  display:     flex;
+  align-items: center;
+  gap:         var(--resq-space-3);
+  padding:     var(--resq-space-6) var(--resq-space-5);
+  border-bottom: 1px solid var(--resq-color-sidebar-border);
+  text-decoration: none;
+  color:       var(--resq-color-text-inverse);
+  flex-shrink: 0;
+}
+
+.sidebar__brand-icon {
+  width:       36px;
+  height:      36px;
+  background:  var(--resq-color-brand-accent);
+  border-radius: var(--resq-radius-md);
+  display:     flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sidebar__brand-icon svg {
+  width:  20px;
+  height: 20px;
+  color:  var(--resq-color-white);
+}
+
+.sidebar__brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar__brand-name {
+  font-size:   var(--resq-font-size-lg);
+  font-weight: var(--resq-font-weight-bold);
+  color:       var(--resq-color-white);
+  line-height: 1.2;
+}
+
+.sidebar__brand-tagline {
+  font-size: var(--resq-font-size-xs);
+  color:     var(--resq-color-text-muted);
+}
+
+/* Navigation */
+.sidebar__nav {
+  flex:    1;
+  padding: var(--resq-space-4) 0;
+}
+
+.nav__section {
+  padding: 0 var(--resq-space-3);
+  margin-bottom: var(--resq-space-2);
+}
+
+.nav__section-label {
+  font-size:      var(--resq-font-size-xs);
+  font-weight:    var(--resq-font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color:          var(--resq-color-text-muted);
+  padding:        var(--resq-space-3) var(--resq-space-3) var(--resq-space-2);
+}
+
+.nav__list {
+  list-style: none;
+  display:    flex;
+  flex-direction: column;
+  gap:        var(--resq-space-1);
+}
+
+.nav__link {
+  display:       flex;
+  align-items:   center;
+  gap:           var(--resq-space-3);
+  padding:       var(--resq-space-3) var(--resq-space-3);
+  border-radius: var(--resq-radius-md);
+  font-size:     var(--resq-font-size-sm);
+  font-weight:   var(--resq-font-weight-medium);
+  color:         var(--resq-color-sidebar-text);
+  text-decoration: none;
+  transition:    background var(--resq-transition-fast),
+                 color var(--resq-transition-fast);
+  min-height:    44px;  /* accessibility: minimum touch target */
+}
+
+.nav__link:hover {
+  background: var(--resq-color-sidebar-hover);
+  color:      var(--resq-color-white);
+}
+
+.nav__link--active {
+  background: var(--resq-color-sidebar-active);
+  color:      var(--resq-color-white);
+}
+
+.nav__link__icon {
+  width:     20px;
+  height:    20px;
+  flex-shrink: 0;
+  opacity:   0.8;
+}
+
+.nav__link--active .nav__link__icon,
+.nav__link:hover  .nav__link__icon {
+  opacity: 1;
+}
+
+.nav__link__label {
+  flex: 1;
+}
+
+/* Sidebar footer */
+.sidebar__footer {
+  padding:    var(--resq-space-4) var(--resq-space-5);
+  border-top: 1px solid var(--resq-color-sidebar-border);
+  font-size:  var(--resq-font-size-xs);
+  color:      var(--resq-color-text-muted);
+  line-height: var(--resq-line-height-loose);
+}
+
+/* ── Top bar ─────────────────────────────────────────────────────────────────── */
+.topbar {
+  position:    fixed;
+  top:         0;
+  left:        var(--resq-sidebar-width);
+  right:       0;
+  height:      var(--resq-topbar-height);
+  background:  var(--resq-color-surface);
+  border-bottom: 1px solid var(--resq-color-border);
+  display:     flex;
+  align-items: center;
+  justify-content: space-between;
+  padding:     0 var(--resq-space-6);
+  z-index:     calc(var(--resq-z-sidebar) - 1);
+  gap:         var(--resq-space-4);
+}
+
+.topbar__left {
+  display:     flex;
+  align-items: center;
+  gap:         var(--resq-space-3);
+}
+
+/* Mobile menu toggle — hidden on desktop */
+.topbar__menu-btn {
+  display:    none;
+  padding:    var(--resq-space-2);
+  border-radius: var(--resq-radius-md);
+  color:      var(--resq-color-text-secondary);
+  min-width:  44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+}
+
+.topbar__menu-btn:hover {
+  background: var(--resq-color-surface-raised);
+  color:      var(--resq-color-text);
+}
+
+.topbar__menu-btn svg {
+  width:  20px;
+  height: 20px;
+}
+
+.topbar__right {
+  display:     flex;
+  align-items: center;
+  gap:         var(--resq-space-3);
+}
+
+.topbar__prototype-label {
+  font-size:   var(--resq-font-size-xs);
+  font-weight: var(--resq-font-weight-semibold);
+  color:       var(--resq-color-warning);
+  background:  var(--resq-color-warning-bg);
+  padding:     var(--resq-space-1) var(--resq-space-3);
+  border-radius: var(--resq-radius-full);
+  border:      1px solid var(--resq-color-medium-border);
+  white-space: nowrap;
+}
+
+/* ── Main content area ───────────────────────────────────────────────────────── */
+.main-content {
+  margin-left:  var(--resq-sidebar-width);
+  margin-top:   var(--resq-topbar-height);
+  min-height:   calc(100vh - var(--resq-topbar-height));
+  padding:      var(--resq-space-8);
+  max-width:    calc(var(--resq-content-max-width) + var(--resq-sidebar-width));
+  width:        100%;
+}
+
+/* ── Section containers ─────────────────────────────────────────────────────── */
+.app-section {
+  max-width: var(--resq-content-max-width);
+  width:     100%;
+}
+
+/* ── Section header ─────────────────────────────────────────────────────────── */
+.section-header {
+  display:         flex;
+  align-items:     flex-start;
+  justify-content: space-between;
+  gap:             var(--resq-space-4);
+  margin-bottom:   var(--resq-space-6);
+  flex-wrap:       wrap;
+}
+
+.section-header__title-group {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--resq-space-1);
+}
+
+.section-header__title {
+  font-size:   var(--resq-font-size-3xl);
+  font-weight: var(--resq-font-weight-bold);
+  color:       var(--resq-color-text);
+  line-height: var(--resq-line-height-tight);
+}
+
+.section-header__subtitle {
+  font-size: var(--resq-font-size-sm);
+  color:     var(--resq-color-text-secondary);
+}
+
+/* ── Storage warning banner ──────────────────────────────────────────────────── */
+#storage-warning-banner {
+  background:  var(--resq-color-error-bg);
+  border:      1px solid var(--resq-color-error);
+  color:       var(--resq-color-error);
+  padding:     var(--resq-space-3) var(--resq-space-6);
+  font-size:   var(--resq-font-size-sm);
+  font-weight: var(--resq-font-weight-medium);
+  text-align:  center;
+  position:    fixed;
+  top:         0;
+  left:        0;
+  right:       0;
+  z-index:     var(--resq-z-toast);
+}
+
+/* ── Sidebar overlay (mobile) ───────────────────────────────────────────────── */
+.sidebar-overlay {
+  display:    none;
+  position:   fixed;
+  inset:      0;
+  background: rgb(0 0 0 / 0.5);
+  z-index:    calc(var(--resq-z-sidebar) - 1);
+}
+
+.sidebar-overlay.is-visible {
+  display: block;
+}

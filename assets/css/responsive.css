@@ -1,0 +1,209 @@
+/* =============================================================================
+   responsive.css
+   Media queries and responsive overrides for ResQGrid.
+   Mobile-first: base styles in main.css target small screens;
+   these queries progressively enhance for larger screens.
+   Breakpoints: 480px · 768px · 1024px · 1280px
+   ============================================================================= */
+
+/* ── 1280px and above (large desktops) ───────────────────────────────────────── */
+@media (min-width: 1280px) {
+  .main-content {
+    padding: var(--resq-space-10) var(--resq-space-12);
+  }
+
+  .summary-cards {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ── 1024px and above (desktops) ─────────────────────────────────────────────── */
+@media (min-width: 1024px) {
+  .summary-cards {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .topbar__menu-btn {
+    display: none;
+  }
+
+  .sidebar {
+    transform: translateX(0);
+  }
+}
+
+/* ── Below 1024px (tablets and mobile) ──────────────────────────────────────── */
+@media (max-width: 1023px) {
+  /* Sidebar collapses off-screen; toggled via .is-open class */
+  .sidebar {
+    transform: translateX(-100%);
+    box-shadow: var(--resq-shadow-xl);
+  }
+
+  .sidebar.is-open {
+    transform: translateX(0);
+  }
+
+  /* Content fills full width when sidebar is hidden */
+  .main-content {
+    margin-left: 0;
+  }
+
+  /* Topbar spans full width */
+  .topbar {
+    left: 0;
+  }
+
+  /* Show mobile menu toggle button */
+  .topbar__menu-btn {
+    display: flex;
+  }
+
+  .summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── 768px and above (tablets) ───────────────────────────────────────────────── */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .main-content {
+    padding: var(--resq-space-6) var(--resq-space-8);
+  }
+
+  .summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dashboard-quicklinks__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Below 768px (mobile) ────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .main-content {
+    padding:    var(--resq-space-4) var(--resq-space-4);
+    margin-top: var(--resq-topbar-height);
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items:    flex-start;
+    gap:            var(--resq-space-3);
+  }
+
+  .section-header__title {
+    font-size: var(--resq-font-size-2xl);
+  }
+
+  .summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--resq-space-3);
+  }
+
+  .summary-card__value {
+    font-size: var(--resq-font-size-3xl);
+  }
+
+  .dashboard-quicklinks__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .empty-state {
+    padding: var(--resq-space-10) var(--resq-space-4);
+  }
+
+  #toast-container {
+    right:     var(--resq-space-4);
+    left:      var(--resq-space-4);
+    max-width: 100%;
+  }
+
+  /* Topbar: hide prototype label on very small screens */
+  .topbar__prototype-label {
+    display: none;
+  }
+}
+
+/* ── Below 480px (small mobile) ─────────────────────────────────────────────── */
+@media (max-width: 479px) {
+  .summary-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-card {
+    flex-direction: row;
+    align-items:    center;
+    gap:            var(--resq-space-4);
+  }
+
+  .summary-card__icon {
+    margin-bottom: 0;
+    flex-shrink:   0;
+  }
+
+  .summary-card__value {
+    font-size: var(--resq-font-size-2xl);
+  }
+
+  .section-header__title {
+    font-size: var(--resq-font-size-xl);
+  }
+
+  .empty-state__icon {
+    width:  56px;
+    height: 56px;
+  }
+
+  .empty-state__icon svg {
+    width:  28px;
+    height: 28px;
+  }
+
+  .empty-state__heading {
+    font-size: var(--resq-font-size-lg);
+  }
+}
+
+/* ── Sidebar overlay (mobile) ────────────────────────────────────────────────── */
+@media (max-width: 1023px) {
+  .sidebar-overlay {
+    display: none;
+  }
+
+  .sidebar-overlay.is-visible {
+    display: block;
+  }
+}
+
+/* ── Print styles ─────────────────────────────────────────────────────────────── */
+@media print {
+  .sidebar,
+  .topbar,
+  .topbar__menu-btn,
+  #toast-container {
+    display: none;
+  }
+
+  .main-content {
+    margin-left:  0;
+    margin-top:   0;
+    padding:      0;
+  }
+
+  body {
+    background: white;
+  }
+}
+
+/* ── Reduced motion ───────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration:        0.01ms !important;
+    animation-iteration-count: 1      !important;
+    transition-duration:       0.01ms !important;
+    scroll-behavior:           auto   !important;
+  }
+}

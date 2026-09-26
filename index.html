@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="ResQGrid — Smart Emergency Resource Coordinator. An educational prototype for campus and community emergency coordination." />
+
+  <title>ResQGrid — Smart Emergency Resource Coordinator</title>
+
+  <!--
+    ResQGrid — Educational Prototype
+    ================================
+    This application uses HTML, CSS, and vanilla JavaScript only.
+    No React, Bootstrap, or external frameworks are used.
+    All data is persisted in browser LocalStorage.
+    DO NOT use in real emergencies.
+  -->
+
+  <!-- Stylesheets: tokens first, then components, then responsive overrides -->
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/responsive.css" />
+</head>
+<body>
+
+  <!-- ── LocalStorage unavailability banner (hidden by default) ─────────── -->
+  <div
+    id="storage-warning-banner"
+    role="alert"
+    aria-live="assertive"
+    hidden
+  >
+    ⚠ Storage unavailable — data will not be saved this session. Please enable cookies/local storage in your browser.
+  </div>
+
+  <!-- ── App layout wrapper ─────────────────────────────────────────────── -->
+  <div class="app-layout">
+
+    <!-- ── Sidebar navigation ───────────────────────────────────────────── -->
+    <nav
+      class="sidebar"
+      id="sidebar"
+      aria-label="Main navigation"
+    >
+      <!-- Brand -->
+      <a href="#dashboard" class="sidebar__brand" aria-label="ResQGrid home">
+        <div class="sidebar__brand-icon" aria-hidden="true">
+          <!-- Shield / cross icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+               aria-hidden="true" focusable="false">
+            <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V7L12 2z"/>
+            <line x1="12" y1="8" x2="12" y2="16"/>
+            <line x1="8"  y1="12" x2="16" y2="12"/>
+          </svg>
+        </div>
+        <div class="sidebar__brand-text">
+          <span class="sidebar__brand-name">ResQGrid</span>
+          <span class="sidebar__brand-tagline">Emergency Coordinator</span>
+        </div>
+      </a>
+
+      <!-- Main navigation links -->
+      <div class="sidebar__nav">
+        <div class="nav__section">
+          <div class="nav__section-label" aria-hidden="true">Operations</div>
+          <ul class="nav__list" role="list">
+
+            <li>
+              <a
+                href="#dashboard"
+                class="nav__link"
+                data-nav-link
+                aria-current="page"
+              >
+                <svg class="nav__link__icon" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <rect x="3" y="3" width="7" height="7"/>
+                  <rect x="14" y="3" width="7" height="7"/>
+                  <rect x="14" y="14" width="7" height="7"/>
+                  <rect x="3"  y="14" width="7" height="7"/>
+                </svg>
+                <span class="nav__link__label">Dashboard</span>
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="#incidents"
+                class="nav__link"
+                data-nav-link
+              >
+                <svg class="nav__link__icon" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                  <line x1="12" y1="9" x2="12" y2="13"/>
+                  <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <span class="nav__link__label">Incidents</span>
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="#resources"
+                class="nav__link"
+                data-nav-link
+              >
+                <svg class="nav__link__icon" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+                </svg>
+                <span class="nav__link__label">Resources</span>
+              </a>
+            </li>
+
+          </ul>
+        </div>
+
+        <div class="nav__section">
+          <div class="nav__section-label" aria-hidden="true">Tools</div>
+          <ul class="nav__list" role="list">
+
+            <li>
+              <a
+                href="#assistant"
+                class="nav__link"
+                data-nav-link
+              >
+                <svg class="nav__link__icon" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                  <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <span class="nav__link__label">Decision Support</span>
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="#stats"
+                class="nav__link"
+                data-nav-link
+              >
+                <svg class="nav__link__icon" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <line x1="18" y1="20" x2="18" y2="10"/>
+                  <line x1="12" y1="20" x2="12" y2="4"/>
+                  <line x1="6"  y1="20" x2="6"  y2="14"/>
+                </svg>
+                <span class="nav__link__label">Statistics</span>
+              </a>
+            </li>
+
+          </ul>
+        </div>
+      </div><!-- /sidebar__nav -->
+
+      <!-- Sidebar footer -->
+      <div class="sidebar__footer" role="contentinfo">
+        <strong>Educational Prototype</strong><br />
+        Not for use in real emergencies.<br />
+        ResQGrid v1.0
+      </div>
+    </nav><!-- /sidebar -->
+
+    <!-- ── Mobile sidebar overlay ────────────────────────────────────────── -->
+    <div
+      class="sidebar-overlay"
+      id="sidebar-overlay"
+      aria-hidden="true"
+    ></div>
+
+    <!-- ── Right-hand side: topbar + content ─────────────────────────────── -->
+    <div style="flex:1; display:flex; flex-direction:column; min-width:0;">
+
+      <!-- Top bar -->
+      <header class="topbar" role="banner">
+        <div class="topbar__left">
+          <!-- Mobile menu toggle -->
+          <button
+            class="topbar__menu-btn btn--ghost"
+            id="mobile-menu-btn"
+            aria-expanded="false"
+            aria-controls="sidebar"
+            aria-label="Open navigation menu"
+            type="button"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" aria-hidden="true">
+              <line x1="3" y1="6"  x2="21" y2="6"/>
+              <line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="topbar__right">
+          <span class="topbar__prototype-label" aria-label="Educational prototype — not for real emergencies">
+            ⚠ Educational Prototype
+          </span>
+        </div>
+      </header>
+
+      <!-- Main content: one <section> per route, all but active are hidden -->
+      <main class="main-content" id="main-content" tabindex="-1">
+
+        <!-- Dashboard -->
+        <section
+          class="app-section"
+          id="section-dashboard"
+          aria-label="Dashboard"
+          hidden
+        ></section>
+
+        <!-- Incidents -->
+        <section
+          class="app-section"
+          id="section-incidents"
+          aria-label="Incident Management"
+          hidden
+        ></section>
+
+        <!-- Resources -->
+        <section
+          class="app-section"
+          id="section-resources"
+          aria-label="Resource Management"
+          hidden
+        ></section>
+
+        <!-- Decision-Support Assistant -->
+        <section
+          class="app-section"
+          id="section-assistant"
+          aria-label="Decision-Support Assistant"
+          hidden
+        ></section>
+
+        <!-- Statistics -->
+        <section
+          class="app-section"
+          id="section-stats"
+          aria-label="Statistics Dashboard"
+          hidden
+        ></section>
+
+      </main><!-- /main-content -->
+
+    </div><!-- /flex column -->
+
+  </div><!-- /app-layout -->
+
+  <!-- ── Toast notification container ──────────────────────────────────── -->
+  <div
+    id="toast-container"
+    role="status"
+    aria-live="polite"
+    aria-atomic="false"
+    aria-label="Notifications"
+  ></div>
+
+  <!-- ── Mobile sidebar toggle script (inline, no module needed) ────────── -->
+  <!--
+    Runs before app.js to wire up the menu button immediately.
+    Keeps sidebar toggle self-contained so it works even if a JS
+    module fails to load.
+  -->
+  <script>
+    (function () {
+      const btn     = document.getElementById('mobile-menu-btn');
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+
+      if (!btn || !sidebar || !overlay) return;
+
+      function openSidebar() {
+        sidebar.classList.add('is-open');
+        overlay.classList.add('is-visible');
+        overlay.setAttribute('aria-hidden', 'false');
+        btn.setAttribute('aria-expanded', 'true');
+        btn.setAttribute('aria-label', 'Close navigation menu');
+      }
+
+      function closeSidebar() {
+        sidebar.classList.remove('is-open');
+        overlay.classList.remove('is-visible');
+        overlay.setAttribute('aria-hidden', 'true');
+        btn.setAttribute('aria-expanded', 'false');
+        btn.setAttribute('aria-label', 'Open navigation menu');
+      }
+
+      btn.addEventListener('click', function () {
+        const isOpen = sidebar.classList.contains('is-open');
+        if (isOpen) { closeSidebar(); } else { openSidebar(); }
+      });
+
+      // Close sidebar when overlay is clicked (mobile)
+      overlay.addEventListener('click', closeSidebar);
+
+      // Close sidebar on any nav link click (mobile)
+      sidebar.addEventListener('click', function (e) {
+        if (e.target.closest('[data-nav-link]')) {
+          closeSidebar();
+        }
+      });
+
+      // Close sidebar on Escape key
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && sidebar.classList.contains('is-open')) {
+          closeSidebar();
+          btn.focus();
+        }
+      });
+    })();
+  </script>
+
+  <!-- ── App entry point (ES module) ───────────────────────────────────── -->
+  <script type="module" src="assets/js/app.js"></script>
+
+</body>
+</html>
