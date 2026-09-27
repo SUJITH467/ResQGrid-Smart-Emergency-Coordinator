@@ -636,3 +636,482 @@
   white-space: nowrap;
   border:     0;
 }
+
+/* =============================================================================
+   Incident Management — Phase 2B components
+   ============================================================================= */
+
+/* ── Type badge (neutral) ────────────────────────────────────────────────────── */
+.badge--type {
+  background: var(--resq-color-surface-raised);
+  color:      var(--resq-color-text-secondary);
+  border:     1px solid var(--resq-color-border);
+}
+
+/* ── Incident toolbar ────────────────────────────────────────────────────────── */
+.incident-toolbar {
+  display:         flex;
+  align-items:     flex-start;
+  gap:             var(--resq-space-3);
+  flex-wrap:       wrap;
+  margin-bottom:   var(--resq-space-4);
+  padding:         var(--resq-space-4);
+  background:      var(--resq-color-surface);
+  border:          1px solid var(--resq-color-border);
+  border-radius:   var(--resq-radius-lg);
+  box-shadow:      var(--resq-shadow-sm);
+}
+
+.incident-toolbar__search {
+  flex:     1;
+  min-width: 200px;
+}
+
+.incident-toolbar__search-wrap {
+  position: relative;
+  display:  flex;
+  align-items: center;
+}
+
+.incident-toolbar__search-icon {
+  position:   absolute;
+  left:       var(--resq-space-3);
+  width:      16px;
+  height:     16px;
+  color:      var(--resq-color-text-muted);
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.incident-toolbar__search-input {
+  padding-left: calc(var(--resq-space-3) + 16px + var(--resq-space-2));
+}
+
+.incident-toolbar__filters {
+  display:     flex;
+  align-items: center;
+  gap:         var(--resq-space-2);
+  flex-wrap:   wrap;
+}
+
+.incident-toolbar__select {
+  min-width:  130px;
+  min-height: 40px;
+  padding:    var(--resq-space-2) var(--resq-space-3);
+}
+
+/* ── Incident list count ─────────────────────────────────────────────────────── */
+.incident-list__count {
+  font-size:     var(--resq-font-size-xs);
+  color:         var(--resq-color-text-muted);
+  margin-bottom: var(--resq-space-3);
+  min-height:    1.2em; /* prevents layout jump when count is empty */
+}
+
+/* ── Incident list ───────────────────────────────────────────────────────────── */
+.incident-list {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--resq-space-3);
+}
+
+/* ── Incident card ───────────────────────────────────────────────────────────── */
+.incident-card {
+  background:    var(--resq-color-surface);
+  border:        1px solid var(--resq-color-border);
+  border-left:   4px solid var(--resq-color-border);
+  border-radius: var(--resq-radius-lg);
+  box-shadow:    var(--resq-shadow-sm);
+  overflow:      hidden;
+  transition:    box-shadow var(--resq-transition-fast),
+                 transform  var(--resq-transition-fast);
+}
+
+.incident-card:hover {
+  box-shadow: var(--resq-shadow-md);
+  transform:  translateY(-1px);
+}
+
+/* Critical accent — left border in critical red */
+.incident-card--critical {
+  border-left-color: var(--resq-color-critical);
+}
+
+.incident-card__header {
+  padding:       var(--resq-space-4) var(--resq-space-5);
+  border-bottom: 1px solid var(--resq-color-border);
+}
+
+.incident-card__id-row {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             var(--resq-space-2);
+  margin-bottom:   var(--resq-space-2);
+  flex-wrap:       wrap;
+}
+
+.incident-card__id {
+  font-size:   var(--resq-font-size-xs);
+  font-weight: var(--resq-font-weight-semibold);
+  color:       var(--resq-color-text-muted);
+  font-family: var(--resq-font-mono);
+  letter-spacing: 0.05em;
+}
+
+.incident-card__badges {
+  display:     flex;
+  align-items: center;
+  gap:         var(--resq-space-1);
+  flex-wrap:   wrap;
+}
+
+.incident-card__title {
+  font-size:     var(--resq-font-size-md);
+  font-weight:   var(--resq-font-weight-semibold);
+  color:         var(--resq-color-text);
+  line-height:   var(--resq-line-height-tight);
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  white-space:   nowrap;
+}
+
+.incident-card__body {
+  padding: var(--resq-space-3) var(--resq-space-5);
+}
+
+.incident-card__description {
+  font-size:     var(--resq-font-size-sm);
+  color:         var(--resq-color-text-secondary);
+  line-height:   var(--resq-line-height-normal);
+  margin-bottom: var(--resq-space-3);
+  overflow:      hidden;
+  display:       -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.incident-card__meta {
+  display:     flex;
+  align-items: center;
+  gap:         var(--resq-space-4);
+  flex-wrap:   wrap;
+}
+
+.incident-card__meta-item {
+  display:     inline-flex;
+  align-items: center;
+  gap:         var(--resq-space-1);
+  font-size:   var(--resq-font-size-xs);
+  color:       var(--resq-color-text-muted);
+}
+
+.incident-card__meta-item svg {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.incident-card__footer {
+  padding:    var(--resq-space-3) var(--resq-space-5);
+  border-top: 1px solid var(--resq-color-border);
+  background: var(--resq-color-surface-raised);
+  display:    flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* ── Incident form wrapper ───────────────────────────────────────────────────── */
+.incident-form-wrapper {
+  max-width: 800px;
+}
+
+/* The form card itself */
+.incident-form {
+  background:    var(--resq-color-surface);
+  border:        1px solid var(--resq-color-border);
+  border-radius: var(--resq-radius-lg);
+  padding:       var(--resq-space-6);
+  box-shadow:    var(--resq-shadow-sm);
+}
+
+/* Two-column layout for the form fields on wider screens */
+.incident-form__grid {
+  display:               grid;
+  grid-template-columns: 1fr 1fr;
+  gap:                   0 var(--resq-space-6);
+}
+
+/* Full-width items span both columns */
+.incident-form__full-width {
+  grid-column: 1 / -1;
+}
+
+.incident-form__actions {
+  display:     flex;
+  align-items: center;
+  gap:         var(--resq-space-3);
+  padding-top: var(--resq-space-4);
+  border-top:  1px solid var(--resq-color-border);
+  margin-top:  var(--resq-space-2);
+}
+
+/* ── Incident detail panel ───────────────────────────────────────────────────── */
+.incident-detail__nav {
+  margin-bottom: var(--resq-space-4);
+}
+
+.incident-detail {
+  background:    var(--resq-color-surface);
+  border:        1px solid var(--resq-color-border);
+  border-radius: var(--resq-radius-lg);
+  padding:       var(--resq-space-6);
+  box-shadow:    var(--resq-shadow-sm);
+}
+
+.incident-detail__header {
+  margin-bottom: var(--resq-space-5);
+}
+
+.incident-detail__title-row {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             var(--resq-space-3);
+  margin-bottom:   var(--resq-space-3);
+  flex-wrap:       wrap;
+}
+
+.incident-detail__id {
+  font-size:      var(--resq-font-size-sm);
+  font-weight:    var(--resq-font-weight-semibold);
+  color:          var(--resq-color-text-muted);
+  font-family:    var(--resq-font-mono);
+  letter-spacing: 0.05em;
+}
+
+.incident-detail__badges {
+  display:     flex;
+  align-items: center;
+  gap:         var(--resq-space-2);
+  flex-wrap:   wrap;
+}
+
+.incident-detail__title {
+  font-size:   var(--resq-font-size-2xl);
+  font-weight: var(--resq-font-weight-bold);
+  color:       var(--resq-color-text);
+  line-height: var(--resq-line-height-tight);
+  word-break:  break-word;
+}
+
+/* Section headings within the detail panel */
+.incident-detail__section-heading {
+  font-size:     var(--resq-font-size-md);
+  font-weight:   var(--resq-font-weight-semibold);
+  color:         var(--resq-color-text);
+  margin-bottom: var(--resq-space-4);
+}
+
+.incident-detail__section-heading--danger {
+  color: var(--resq-color-critical);
+}
+
+/* Status section */
+.incident-detail__status-section {
+  margin-bottom: var(--resq-space-5);
+}
+
+.incident-detail__status-actions {
+  display:     flex;
+  align-items: center;
+  gap:         var(--resq-space-3);
+  flex-wrap:   wrap;
+  margin-top:  var(--resq-space-4);
+}
+
+/* ── Status track (progress stepper) ────────────────────────────────────────── */
+.incident-detail__status-track {
+  display:     flex;
+  align-items: center;
+  gap:         0;
+  overflow-x:  auto;
+  padding-bottom: var(--resq-space-1);
+}
+
+.status-step {
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            var(--resq-space-1);
+  min-width:      80px;
+  text-align:     center;
+}
+
+.status-step__dot {
+  width:         14px;
+  height:        14px;
+  border-radius: var(--resq-radius-full);
+  border:        2px solid var(--resq-color-border-strong);
+  background:    var(--resq-color-surface);
+  transition:    background var(--resq-transition-fast),
+                 border-color var(--resq-transition-fast);
+}
+
+.status-step__label {
+  font-size:   var(--resq-font-size-xs);
+  font-weight: var(--resq-font-weight-medium);
+  color:       var(--resq-color-text-muted);
+  white-space: nowrap;
+}
+
+/* Connector line between steps */
+.status-step__line {
+  flex:            1;
+  height:          2px;
+  background:      var(--resq-color-border);
+  min-width:       20px;
+  margin-bottom:   calc(var(--resq-font-size-xs) + var(--resq-space-1));
+  /* push down to align with dots */
+  align-self:      flex-end;
+  margin-bottom:   20px;
+}
+
+/* Done step */
+.status-step--done .status-step__dot {
+  background:   var(--resq-color-status-resolved);
+  border-color: var(--resq-color-status-resolved);
+}
+
+.status-step--done .status-step__label {
+  color: var(--resq-color-status-resolved);
+}
+
+/* Current step */
+.status-step--current .status-step__dot {
+  background:   var(--resq-color-brand-primary);
+  border-color: var(--resq-color-brand-primary);
+  box-shadow:   0 0 0 3px rgb(59 130 246 / 0.25);
+}
+
+.status-step--current .status-step__label {
+  color:       var(--resq-color-brand-primary);
+  font-weight: var(--resq-font-weight-semibold);
+}
+
+/* Future step */
+.status-step--future .status-step__dot {
+  background:   var(--resq-color-surface);
+  border-color: var(--resq-color-border);
+}
+
+/* ── Detail grid (definition list) ──────────────────────────────────────────── */
+.incident-detail__grid {
+  display:               grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap:                   var(--resq-space-5) var(--resq-space-8);
+}
+
+/* Description spans full width */
+.incident-detail__field:first-child {
+  grid-column: 1 / -1;
+}
+
+.incident-detail__field {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--resq-space-1);
+}
+
+.incident-detail__field-label {
+  font-size:   var(--resq-font-size-xs);
+  font-weight: var(--resq-font-weight-semibold);
+  color:       var(--resq-color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.incident-detail__field-value {
+  font-size:   var(--resq-font-size-sm);
+  color:       var(--resq-color-text);
+  line-height: var(--resq-line-height-normal);
+  word-break:  break-word;
+}
+
+.incident-detail__description {
+  line-height: var(--resq-line-height-loose);
+  white-space: pre-wrap;
+}
+
+.incident-detail__relative {
+  font-size: var(--resq-font-size-xs);
+  color:     var(--resq-color-text-muted);
+  margin-left: var(--resq-space-1);
+}
+
+/* ── Assigned resources ──────────────────────────────────────────────────────── */
+.incident-detail__resources {
+  margin-bottom: var(--resq-space-2);
+}
+
+.incident-detail__resource-list {
+  list-style:    none;
+  display:       flex;
+  flex-direction: column;
+  gap:           var(--resq-space-2);
+  margin-bottom: var(--resq-space-3);
+}
+
+.incident-detail__resource-item {
+  display:     flex;
+  align-items: center;
+  gap:         var(--resq-space-2);
+  font-size:   var(--resq-font-size-sm);
+  color:       var(--resq-color-text);
+  padding:     var(--resq-space-2) var(--resq-space-3);
+  background:  var(--resq-color-surface-raised);
+  border:      1px solid var(--resq-color-border);
+  border-radius: var(--resq-radius-md);
+}
+
+.incident-detail__no-resources {
+  font-size: var(--resq-font-size-sm);
+  color:     var(--resq-color-text-muted);
+  font-style: italic;
+}
+
+.incident-detail__resource-note {
+  font-size:   var(--resq-font-size-xs);
+  color:       var(--resq-color-text-muted);
+  margin-top:  var(--resq-space-2);
+}
+
+/* ── Notes section ───────────────────────────────────────────────────────────── */
+.incident-detail__notes {
+  margin-bottom: var(--resq-space-2);
+}
+
+.incident-detail__notes-actions {
+  display:     flex;
+  align-items: center;
+  gap:         var(--resq-space-3);
+}
+
+.incident-detail__notes-saved {
+  font-size:   var(--resq-font-size-xs);
+  color:       var(--resq-color-success);
+  font-weight: var(--resq-font-weight-medium);
+}
+
+/* ── Danger zone ─────────────────────────────────────────────────────────────── */
+.incident-detail__danger {
+  padding:       var(--resq-space-5);
+  background:    var(--resq-color-critical-bg);
+  border:        1px solid var(--resq-color-critical-border);
+  border-radius: var(--resq-radius-lg);
+}
+
+.incident-detail__danger-note {
+  font-size:     var(--resq-font-size-sm);
+  color:         var(--resq-color-text-secondary);
+  margin-bottom: var(--resq-space-4);
+}

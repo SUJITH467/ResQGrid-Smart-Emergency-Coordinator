@@ -2,58 +2,186 @@
  * app.js
  * ------
  * ResQGrid application entry point.
- * Initialises the store, registers placeholder routes, and starts the router.
+ * Initialises the store, registers routes, and starts the router.
  *
- * Phase 1: Foundation only.
- * Placeholder render functions display empty states for each section.
- * Feature modules will replace these in later phases.
+ * Phase 2B: Incident Management wired in.
+ * Phases 3-5 placeholders remain for future implementation.
  */
 
-import { initStore, isLocalStorageAvailable, STORAGE_KEYS } from './store.js';
-import { initRouter, registerRoute }                        from './router.js';
-import { logger, formatDate, getNow }                       from './utils.js';
+import { initStore, isLocalStorageAvailable }    from './store.js';
+import { initRouter, registerRoute }             from './router.js';
+import { logger }                                from './utils.js';
+import { getAllIncidents }                        from './services/incidentService.js';
+
+// Phase 2B: Incident UI modules.
+import { renderIncidentForm }    from './ui/incidentForm.js';
+import { renderIncidentList, refreshIncidentList } from './ui/incidentList.js';
+import { renderIncidentDetail }  from './ui/incidentDetail.js';
 
 // ── Application initialisation ─────────────────────────────────────────────
 
-/**
- * Main entry point. Called when the DOM is ready.
- */
 function init() {
   logger.info('app: Starting ResQGrid…');
 
-  // 1. Initialise LocalStorage (creates default keys if absent).
   initStore();
 
-  // 2. Show a warning banner if LocalStorage is unavailable.
   if (!isLocalStorageAvailable()) {
     showStorageWarningBanner();
   }
 
-  // 3. Register placeholder render functions for each route.
-  //    These will be replaced by feature modules in later phases.
+  // Register routes.
   registerRoute('#dashboard', renderDashboard);
   registerRoute('#incidents', renderIncidents);
   registerRoute('#resources', renderResources);
   registerRoute('#assistant', renderAssistant);
   registerRoute('#stats',     renderStats);
 
-  // 4. Start the router (renders the current route immediately).
   initRouter();
 
   logger.info('app: Ready.');
 }
 
-// ── Placeholder render functions ───────────────────────────────────────────
-// Each function receives its section's root <section> element.
-// Replace these with real feature modules in Phases 2–5.
+// ── Incidents section ──────────────────────────────────────────────────────
+//
+// The incidents section is a single-pane UI with three sub-views:
+//   'list'   → incidentList.js
+//   'form'   → incidentForm.js
+//   'detail' → incidentDetail.js
+//
+// Sub-views are controlled by swapping innerHTML of a sub-pane container.
+// The section header + disclaimer always stay visible.
 
 /**
- * Render the Dashboard section.
- * Phase 1: Shows summary cards with empty states.
+ * Render the Incidents section.
+ * Called by the router each time #incidents is activated.
  *
  * @param {HTMLElement} el
  */
+function renderIncidents(el) {
+  el.innerHTML = `
+    <div class="section-header">
+      <div class="section-header__title-group">
+        <h1 class="section-header__title">Incidents</h1>
+        <p class="section-header__subtitle">Report and manage emergency incidents</p>
+      </div>
+      <span class="badge badge--prototype">Educational Prototype</span>
+    </div>
+
+    ${buildPrototypeDisclaimer()}
+
+    <div id="incidents-pane"></div>
+  `;
+
+  // Start on the list view.
+  showListView(el);
+}
+
+/**
+ * Show the incident list inside the incidents section.
+ * @param {HTMLElement} sectionEl
+ */
+function showListView(sectionEl) {
+  const pane = sectionEl.querySelector('#incidents-pane');
+  if (!pane) return;
+  pane.innerHTML = '';
+
+  renderIncidentList(
+    pane,
+    // onReportNew — switch to the form view.
+    () => showFormView(sectionEl),
+    // onViewDetail — switch to the detail view.
+    (incident) => showDetailView(sectionEl, incident.id)
+  );
+}
+
+/**
+ * Show the incident creation form inside the incidents section.
+ * @param {HTMLElement} sectionEl
+ */
+function showFormView(sectionEl) {
+  const pane = sectionEl.querySelector('#incidents-pane');
+  if (!pane) return;
+
+  // Build a wrapper with a heading.
+  pane.innerHTML = `
+    <div class="incident-form-wrapper">
+      <div class="section-header" style="margin-bottom: var(--resq-space-6);">
+        <div class="section-header__title-group">
+          <h2 class="section-header__title" style="font-size: var(--resq-font-size-2xl);">
+            Report New Incident
+          </h2>
+          <p class="section-header__subtitle">
+            Fill in the details below. All fields marked * are required.
+          </p>
+        </div>
+      </div>
+      <div id="incident-form-container"></div>
+    </div>
+  `;
+
+  const formContainer = pane.querySelector('#incident-form-container');
+  if (!formContainer) return;
+
+  renderIncidentForm(formContainer, (newIncident) => {
+    if (newIncident) {
+      // Incident created — go back to list.
+      showListView(sectionEl);
+      // Also refresh dashboard counts if user navigates there.
+      scheduleDashboardRefresh();
+    } else {
+      // User cancelled.
+      showListView(sectionEl);
+    }
+  });
+}
+
+/**
+ * Show the incident detail view inside the incidents section.
+ * @param {HTMLElement} sectionEl
+ * @param {string}      incidentId
+ */
+function showDetailView(sectionEl, incidentId) {
+  const pane = sectionEl.querySelector('#incidents-pane');
+  if (!pane) return;
+  pane.innerHTML = '';
+
+  renderIncidentDetail(
+    pane,
+    incidentId,
+    // onBack — return to list.
+    () => showListView(sectionEl),
+    // onChanged — refresh list counts and dashboard.
+    () => {
+      refreshIncidentList();
+      scheduleDashboardRefresh();
+    }
+  );
+}
+
+// ── Dashboard section ──────────────────────────────────────────────────────
+
+// Flag: set true when incident data changes so dashboard re-reads on next visit.
+let _dashboardDirty = false;
+
+/** Mark the dashboard as needing a data refresh. */
+function scheduleDashboardRefresh() {
+  _dashboardDirty = true;
+}
+
+/**
+ * Render the Dashboard section with live incident counts.
+ * @param {HTMLElement} el
+ */
 function renderDashboard(el) {
+  _dashboardDirty = false;
+
+  // Read live counts from the service.
+  const all        = getAllIncidents();
+  const total      = all.length;
+  const active     = all.filter((i) => i.status !== 'Resolved').length;
+  const critical   = all.filter((i) => i.priority === 'Critical').length;
+  const resolved   = all.filter((i) => i.status === 'Resolved').length;
+
   el.innerHTML = `
     <div class="section-header">
       <div class="section-header__title-group">
@@ -67,38 +195,38 @@ function renderDashboard(el) {
 
     <div class="summary-cards" role="list" aria-label="Summary metrics">
 
-      <article class="summary-card" role="listitem" aria-label="0 Active Incidents">
+      <article class="summary-card" role="listitem" aria-label="${active} Active Incidents">
         <div class="summary-card__icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
             <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
           </svg>
         </div>
-        <div class="summary-card__value">0</div>
+        <div class="summary-card__value">${active}</div>
         <div class="summary-card__label">Active Incidents</div>
-        <div class="summary-card__sub">of 0 total</div>
+        <div class="summary-card__sub">of ${total} total</div>
       </article>
 
-      <article class="summary-card summary-card--critical" role="listitem" aria-label="0 Critical Incidents">
+      <article class="summary-card summary-card--critical" role="listitem" aria-label="${critical} Critical Incidents">
         <div class="summary-card__icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10"/>
             <line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
           </svg>
         </div>
-        <div class="summary-card__value">0</div>
+        <div class="summary-card__value">${critical}</div>
         <div class="summary-card__label">Critical Incidents</div>
         <div class="summary-card__sub">require immediate attention</div>
       </article>
 
-      <article class="summary-card summary-card--resolved" role="listitem" aria-label="0 Resolved Incidents">
+      <article class="summary-card summary-card--resolved" role="listitem" aria-label="${resolved} Resolved Incidents">
         <div class="summary-card__icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
             <polyline points="22 4 12 14.01 9 11.01"/>
           </svg>
         </div>
-        <div class="summary-card__value">0</div>
+        <div class="summary-card__value">${resolved}</div>
         <div class="summary-card__label">Resolved Incidents</div>
         <div class="summary-card__sub">this session</div>
       </article>
@@ -146,10 +274,10 @@ function renderDashboard(el) {
         </div>
         <div class="summary-card__value">N/A</div>
         <div class="summary-card__label">Avg. Resolution Time</div>
-        <div class="summary-card__sub">no resolved incidents yet</div>
+        <div class="summary-card__sub">coming in Phase 5</div>
       </article>
 
-      <article class="summary-card" role="listitem" aria-label="0 Total Incidents">
+      <article class="summary-card" role="listitem" aria-label="${total} Total Incidents">
         <div class="summary-card__icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -158,7 +286,7 @@ function renderDashboard(el) {
             <polyline points="10 9 9 9 8 9"/>
           </svg>
         </div>
-        <div class="summary-card__value">0</div>
+        <div class="summary-card__value">${total}</div>
         <div class="summary-card__label">Total Incidents</div>
         <div class="summary-card__sub">all time</div>
       </article>
@@ -221,45 +349,8 @@ function renderDashboard(el) {
   `;
 }
 
-/**
- * Render the Incidents section placeholder.
- * @param {HTMLElement} el
- */
-function renderIncidents(el) {
-  el.innerHTML = `
-    <div class="section-header">
-      <div class="section-header__title-group">
-        <h1 class="section-header__title">Incidents</h1>
-        <p class="section-header__subtitle">Report and manage emergency incidents</p>
-      </div>
-      <span class="badge badge--prototype">Educational Prototype</span>
-    </div>
+// ── Placeholder routes (Phases 3–5) ───────────────────────────────────────
 
-    ${buildPrototypeDisclaimer()}
-
-    <div class="empty-state">
-      <div class="empty-state__icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-          <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-        </svg>
-      </div>
-      <h2 class="empty-state__heading">Incident Management</h2>
-      <p class="empty-state__message">
-        This section will allow you to report, classify, and manage emergency incidents.
-        Coming in Phase 2.
-      </p>
-      <p class="empty-state__detail">
-        Features: report incident · assign priority · track status · view incident history
-      </p>
-    </div>
-  `;
-}
-
-/**
- * Render the Resources section placeholder.
- * @param {HTMLElement} el
- */
 function renderResources(el) {
   el.innerHTML = `
     <div class="section-header">
@@ -269,9 +360,7 @@ function renderResources(el) {
       </div>
       <span class="badge badge--prototype">Educational Prototype</span>
     </div>
-
     ${buildPrototypeDisclaimer()}
-
     <div class="empty-state">
       <div class="empty-state__icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -280,21 +369,12 @@ function renderResources(el) {
         </svg>
       </div>
       <h2 class="empty-state__heading">Resource Management</h2>
-      <p class="empty-state__message">
-        This section will allow you to add, track, and deploy emergency resources.
-        Coming in Phase 3.
-      </p>
-      <p class="empty-state__detail">
-        Features: add resources · assign to incidents · track availability · release resources
-      </p>
+      <p class="empty-state__message">Add, track, and deploy emergency resources. Coming in Phase 3.</p>
+      <p class="empty-state__detail">add resources · assign to incidents · track availability</p>
     </div>
   `;
 }
 
-/**
- * Render the Decision-Support Assistant section placeholder.
- * @param {HTMLElement} el
- */
 function renderAssistant(el) {
   el.innerHTML = `
     <div class="section-header">
@@ -304,14 +384,11 @@ function renderAssistant(el) {
       </div>
       <span class="badge badge--prototype">Prototype — Not AI</span>
     </div>
-
     <div class="alert alert--warning" role="note">
       <strong>Prototype Notice:</strong> The Decision-Support Assistant uses keyword matching rules,
       not artificial intelligence. All suggestions are advisory only.
-      The coordinator makes every final decision.
       <strong>Do not use in real emergencies.</strong>
     </div>
-
     <div class="empty-state">
       <div class="empty-state__icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -321,21 +398,12 @@ function renderAssistant(el) {
       </div>
       <h2 class="empty-state__heading">Decision-Support Assistant (Prototype)</h2>
       <p class="empty-state__message">
-        This tool will analyze a plain-language incident description and suggest an incident type,
-        priority, and required resources using transparent keyword rules.
-        Coming in Phase 4.
-      </p>
-      <p class="empty-state__detail">
-        Features: describe incident · get classification suggestion · review reasoning · transfer to incident form
+        Analyze a plain-language incident description and get a classification suggestion. Coming in Phase 4.
       </p>
     </div>
   `;
 }
 
-/**
- * Render the Statistics section placeholder.
- * @param {HTMLElement} el
- */
 function renderStats(el) {
   el.innerHTML = `
     <div class="section-header">
@@ -345,9 +413,7 @@ function renderStats(el) {
       </div>
       <span class="badge badge--prototype">Educational Prototype</span>
     </div>
-
     ${buildPrototypeDisclaimer()}
-
     <div class="empty-state">
       <div class="empty-state__icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -356,25 +422,13 @@ function renderStats(el) {
         </svg>
       </div>
       <h2 class="empty-state__heading">Statistics Dashboard</h2>
-      <p class="empty-state__message">
-        This section will display live metrics derived from your incident and resource data.
-        Coming in Phase 5.
-      </p>
-      <p class="empty-state__detail">
-        Features: incidents by type · priority breakdown · resolution times · resource utilization
-      </p>
+      <p class="empty-state__message">Live metrics from incident and resource data. Coming in Phase 5.</p>
     </div>
   `;
 }
 
-// ── Shared UI helpers ──────────────────────────────────────────────────────
+// ── Shared helpers ─────────────────────────────────────────────────────────
 
-/**
- * Build the standard prototype disclaimer HTML string.
- * Must appear on every section that deals with emergency data.
- *
- * @returns {string} HTML string
- */
 function buildPrototypeDisclaimer() {
   return `
     <div class="alert alert--info prototype-disclaimer" role="note">
@@ -391,19 +445,12 @@ function buildPrototypeDisclaimer() {
   `;
 }
 
-/**
- * Show a persistent banner when LocalStorage is unavailable.
- * Data will not persist this session.
- */
 function showStorageWarningBanner() {
   const banner = document.getElementById('storage-warning-banner');
-  if (banner) {
-    banner.hidden = false;
-  }
+  if (banner) banner.hidden = false;
 }
 
 // ── Boot ───────────────────────────────────────────────────────────────────
-// Wait for the DOM to be ready before initialising.
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
 } else {

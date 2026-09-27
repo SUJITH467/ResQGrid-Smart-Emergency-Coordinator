@@ -207,3 +207,122 @@
     scroll-behavior:           auto   !important;
   }
 }
+
+/* =============================================================================
+   Incident Management — Phase 2B responsive overrides
+   ============================================================================= */
+
+/* ── Below 1024px ────────────────────────────────────────────────────────────── */
+@media (max-width: 1023px) {
+  /* Toolbar: stack search above filters */
+  .incident-toolbar {
+    flex-direction: column;
+    align-items:    stretch;
+  }
+
+  .incident-toolbar__search {
+    min-width: 0;
+    width:     100%;
+  }
+
+  .incident-toolbar__filters {
+    justify-content: flex-start;
+  }
+
+  .incident-toolbar > .btn--primary {
+    align-self: flex-start;
+  }
+}
+
+/* ── Below 768px (mobile) ────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  /* Form: single column */
+  .incident-form__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .incident-form__full-width {
+    grid-column: 1;
+  }
+
+  .incident-form {
+    padding: var(--resq-space-4);
+  }
+
+  /* Filter selects: stack vertically */
+  .incident-toolbar__filters {
+    flex-direction: column;
+    align-items:    stretch;
+  }
+
+  .incident-toolbar__select {
+    width:     100%;
+    min-width: 0;
+  }
+
+  /* Incident cards: tighter padding */
+  .incident-card__header,
+  .incident-card__body,
+  .incident-card__footer {
+    padding-left:  var(--resq-space-4);
+    padding-right: var(--resq-space-4);
+  }
+
+  .incident-card__badges {
+    gap: var(--resq-space-1);
+  }
+
+  /* Detail panel */
+  .incident-detail {
+    padding: var(--resq-space-4);
+  }
+
+  .incident-detail__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .incident-detail__field:first-child {
+    grid-column: 1;
+  }
+
+  .incident-detail__title {
+    font-size: var(--resq-font-size-xl);
+  }
+
+  /* Status track: allow horizontal scroll on small screens */
+  .incident-detail__status-track {
+    overflow-x: auto;
+    padding-bottom: var(--resq-space-2);
+  }
+
+  .status-step {
+    min-width: 60px;
+  }
+}
+
+/* ── Below 480px ─────────────────────────────────────────────────────────────── */
+@media (max-width: 479px) {
+  /* Incident card meta: stack items */
+  .incident-card__meta {
+    flex-direction: column;
+    align-items:    flex-start;
+    gap:            var(--resq-space-2);
+  }
+
+  /* Form actions: stack buttons */
+  .incident-form__actions {
+    flex-direction: column;
+    align-items:    stretch;
+  }
+
+  .incident-form__actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Detail status actions: stack */
+  .incident-detail__status-actions {
+    flex-direction: column;
+    align-items:    flex-start;
+  }
+}
