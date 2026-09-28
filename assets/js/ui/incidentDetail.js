@@ -1,16 +1,11 @@
 /**
  * incidentDetail.js
  * -----------------
- * Renders a full incident detail panel inside the incidents section.
+ * Renders a full incident detail panel.
  *
- * Responsibilities:
- * - Show all incident fields (full title, description, timestamps, notes, resources)
- * - Render the single valid status advancement button (hidden when Resolved)
- * - Render a "Save Notes" textarea and button
- * - Render a "Delete" button only for Resolved incidents
- * - Fire onBack() when "Back to Incidents" is clicked
- * - Fire onChanged() after any successful status/notes/delete operation
- *   so the parent can refresh the list and dashboard counts
+ * Phase 3 additions:
+ * - Shows real resource names (not just IDs) for assigned resources.
+ * - Embeds the assignment panel (assign + release) for non-Resolved incidents.
  */
 
 import {
@@ -21,13 +16,16 @@ import {
   getNextStatus,
 } from '../services/incidentService.js';
 
+import { getAllResources } from '../services/resourceService.js';
+
 import {
   escapeHtml,
   formatDate,
   formatRelativeTime,
 } from '../utils.js';
 
-import { showToast } from './toast.js';
+import { showToast }            from './toast.js';
+import { renderAssignmentPanel } from './assignmentPanel.js';
 
 // ── Public API ─────────────────────────────────────────────────────────────
 
@@ -66,18 +64,37 @@ export function renderIncidentDetail(container, incidentId, onBack, onChanged) {
 
   container.innerHTML = buildDetailHTML(inc);
   attachDetailListeners(container, inc, onBack, onChanged);
+
+  // Mount the assignment panel into the resources section placeholder.
+  const assignmentTarget = container.querySelector('#assignment-panel-mount');
+  if (assignmentTarget) {
+    // Wrap onChanged so the detail panel also refreshes after assignment/release.
+    const onAssignmentChanged = () => {
+      if (onChanged) onChanged();
+      // Re-render the whole detail with fresh data.
+      renderIncidentDetail(container, incidentId, onBack, onChanged);
+    };
+    renderAssignmentPanel(assignmentTarget, inc, onAssignmentChanged);
+  }
 }
 
 // ── HTML builder ───────────────────────────────────────────────────────────
 
 function buildDetailHTML(inc) {
-  const nextStatus     = getNextStatus(inc.status);
-  const isResolved     = inc.status === 'Resolved';
-  const priorityClass  = getPriorityBadgeClass(inc.priority);
-  const statusClass    = getStatusBadgeClass(inc.status);
-  const resources      = inc.assignedResources || [];
+  const nextStatus    = getNextStatus(inc.status);
+  const isResolved    = inc.status === 'Resolved';
+  const priorityClass = getPriorityBadgeClass(inc.priority);
+  const statusClass   = getStatusBadgeClass(inc.status);
 
-  // Status advancement button — hidden when Resolved.
+  // Resolve resource IDs to real names for display.
+  const allResources  = getAllResources();
+  const assignedIds   = inc.assignedResources || [];
+  const resolvedResources = assignedIds.map((rid) => {
+    const r = allResources.find((x) => x.id === rid);
+    return r || { id: rid, name: rid, type: 'Unknown', status: 'Unknown' };
+  });
+
+  // Status advancement button.
   const statusBtnHTML = nextStatus ? `
     <button type="button" class="btn btn--primary" id="advance-status-btn"
             data-incident-id="${escapeHtml(inc.id)}"
@@ -96,8 +113,7 @@ function buildDetailHTML(inc) {
     <button type="button" class="btn btn--danger btn--sm" id="delete-incident-btn"
             data-incident-id="${escapeHtml(inc.id)}"
             aria-label="Delete incident ${escapeHtml(inc.id)}">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-           aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <polyline points="3 6 5 6 21 6"/>
         <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
         <path d="M10 11v6M14 11v6"/>
@@ -107,27 +123,24 @@ function buildDetailHTML(inc) {
     </button>
   ` : '';
 
-  // Assigned resources section.
-  const resourcesHTML = resources.length > 0
+  // Resource summary (resolved view — static list, no assign/release controls).
+  const resolvedResourcesHTML = resolvedResources.length > 0
     ? `<ul class="incident-detail__resource-list">
-        ${resources.map((id) => `
+        ${resolvedResources.map((r) => `
           <li class="incident-detail__resource-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                 aria-hidden="true" width="14" height="14">
-              <polygon points="3 11 22 2 13 21 11 13 3 11"/>
-            </svg>
-            ${escapeHtml(id)}
+            <span class="badge badge--type">${escapeHtml(r.type)}</span>
+            <span>${escapeHtml(r.name)}</span>
+            <span class="incident-detail__resource-id">${escapeHtml(r.id)}</span>
           </li>`).join('')}
        </ul>`
-    : `<p class="incident-detail__no-resources">No resources assigned yet.</p>`;
+    : `<p class="incident-detail__no-resources">No resources were assigned to this incident.</p>`;
 
   return `
     <!-- Back navigation -->
     <div class="incident-detail__nav">
       <button type="button" class="btn btn--ghost btn--sm" id="detail-back-btn"
               aria-label="Back to incidents list">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-             aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <line x1="19" y1="12" x2="5" y2="12"/>
           <polyline points="12 19 5 12 12 5"/>
         </svg>
@@ -213,17 +226,17 @@ function buildDetailHTML(inc) {
           </dd>
         </div>` : ''}
 
-      </div><!-- /incident-detail__grid -->
+      </div>
 
       <hr class="divider" />
 
-      <!-- Assigned resources (read-only in Phase 2) -->
+      <!-- Resources section -->
       <div class="incident-detail__resources">
-        <h3 class="incident-detail__section-heading">Assigned Resources</h3>
-        ${resourcesHTML}
-        <p class="incident-detail__resource-note">
-          Resource assignment is managed in the Resources section.
-        </p>
+        ${isResolved
+          ? `<h3 class="incident-detail__section-heading">Resources (at resolution)</h3>
+             ${resolvedResourcesHTML}`
+          : `<div id="assignment-panel-mount"></div>`
+        }
       </div>
 
       <hr class="divider" />
@@ -274,13 +287,9 @@ function buildDetailHTML(inc) {
 // ── Event wiring ───────────────────────────────────────────────────────────
 
 function attachDetailListeners(container, inc, onBack, onChanged) {
-  // Back button.
   const backBtn = container.querySelector('#detail-back-btn');
-  if (backBtn && onBack) {
-    backBtn.addEventListener('click', onBack);
-  }
+  if (backBtn && onBack) backBtn.addEventListener('click', onBack);
 
-  // Advance status button.
   const advanceBtn = container.querySelector('#advance-status-btn');
   if (advanceBtn) {
     advanceBtn.addEventListener('click', () => {
@@ -288,30 +297,19 @@ function attachDetailListeners(container, inc, onBack, onChanged) {
     });
   }
 
-  // Save notes button.
   const saveNotesBtn = container.querySelector('#save-notes-btn');
   if (saveNotesBtn) {
-    saveNotesBtn.addEventListener('click', () => {
-      handleSaveNotes(container, inc.id, onChanged);
-    });
+    saveNotesBtn.addEventListener('click', () => handleSaveNotes(container, inc.id, onChanged));
   }
 
-  // Delete button.
   const deleteBtn = container.querySelector('#delete-incident-btn');
   if (deleteBtn) {
-    deleteBtn.addEventListener('click', () => {
-      handleDelete(container, inc, onBack, onChanged);
-    });
+    deleteBtn.addEventListener('click', () => handleDelete(container, inc, onBack, onChanged));
   }
 }
 
 // ── Action handlers ────────────────────────────────────────────────────────
 
-/**
- * Handle status advancement.
- * onBack is passed in directly so the re-render after status change
- * preserves the real "go back to list" callback.
- */
 function handleStatusAdvance(container, incidentId, advanceBtn, onBack, onChanged) {
   const nextStatus = advanceBtn.getAttribute('data-next-status');
   const errorSpan  = container.querySelector('#status-action-error');
@@ -319,110 +317,72 @@ function handleStatusAdvance(container, incidentId, advanceBtn, onBack, onChange
   if (!nextStatus) return;
 
   advanceBtn.disabled = true;
-
   const result = updateIncidentStatus(incidentId, nextStatus);
-
   advanceBtn.disabled = false;
 
   if (!result.success) {
-    if (errorSpan) {
-      errorSpan.textContent = result.error || 'Status could not be updated. Please try again.';
-      errorSpan.hidden      = false;
-    }
+    if (errorSpan) { errorSpan.textContent = result.error; errorSpan.hidden = false; }
     showToast(result.error || 'Status could not be updated.', 'error');
     return;
   }
 
   showToast(`Incident ${incidentId} marked as ${nextStatus}.`, 'success');
-
-  // Notify parent (refreshes list + dashboard counts).
   if (onChanged) onChanged();
-
-  // Re-render this detail panel with fresh data, preserving the real onBack.
   renderIncidentDetail(container, incidentId, onBack, onChanged);
 }
 
-/**
- * Handle notes save.
- */
 function handleSaveNotes(container, incidentId, onChanged) {
-  const textarea  = container.querySelector('#inc-detail-notes');
-  const savedMsg  = container.querySelector('#notes-saved-msg');
-  const saveBtn   = container.querySelector('#save-notes-btn');
-
+  const textarea = container.querySelector('#inc-detail-notes');
+  const savedMsg = container.querySelector('#notes-saved-msg');
+  const saveBtn  = container.querySelector('#save-notes-btn');
   if (!textarea) return;
 
-  const notes = textarea.value;
-
   if (saveBtn) saveBtn.disabled = true;
-
-  const result = updateIncidentNotes(incidentId, notes);
-
+  const result = updateIncidentNotes(incidentId, textarea.value);
   if (saveBtn) saveBtn.disabled = false;
 
   if (!result.success) {
-    showToast(result.error || 'Could not save notes. Please try again.', 'error');
+    showToast(result.error || 'Could not save notes.', 'error');
     return;
   }
 
-  // Show brief "Saved" confirmation inline.
-  if (savedMsg) {
-    savedMsg.hidden = false;
-    setTimeout(() => { savedMsg.hidden = true; }, 2500);
-  }
-
+  if (savedMsg) { savedMsg.hidden = false; setTimeout(() => { savedMsg.hidden = true; }, 2500); }
   showToast('Notes saved.', 'success');
   if (onChanged) onChanged();
 }
 
-/**
- * Handle incident deletion with confirmation dialog.
- */
 function handleDelete(container, inc, onBack, onChanged) {
   const errorSpan = container.querySelector('#delete-error');
-
-  // Confirmation dialog.
   const confirmed = window.confirm(
     `Delete incident ${inc.id}: "${inc.title}"?\n\nThis action cannot be undone.`
   );
-
   if (!confirmed) return;
 
   const result = deleteIncident(inc.id);
-
   if (!result.success) {
-    if (errorSpan) {
-      errorSpan.textContent = result.error || 'Could not delete incident. Please try again.';
-      errorSpan.hidden      = false;
-    }
+    if (errorSpan) { errorSpan.textContent = result.error; errorSpan.hidden = false; }
     showToast(result.error || 'Could not delete incident.', 'error');
     return;
   }
 
   showToast(`Incident ${inc.id} deleted.`, 'success');
-
-  // Navigate back to the list.
   if (onChanged) onChanged();
   if (onBack)    onBack();
 }
 
 // ── Status track builder ───────────────────────────────────────────────────
 
-/**
- * Build the visual status track (Reported → Active → In Progress → Resolved).
- * @param {string} currentStatus
- * @returns {string} HTML
- */
 function buildStatusTrack(currentStatus) {
-  const statuses = ['Reported', 'Active', 'In Progress', 'Resolved'];
+  const statuses     = ['Reported', 'Active', 'In Progress', 'Resolved'];
   const currentIndex = statuses.indexOf(currentStatus);
 
   return statuses.map((s, i) => {
     const isDone    = i < currentIndex;
     const isCurrent = i === currentIndex;
-    const cls       = isDone ? 'status-step--done' : isCurrent ? 'status-step--current' : 'status-step--future';
+    const cls = isDone ? 'status-step--done' : isCurrent ? 'status-step--current' : 'status-step--future';
     return `
-      <div class="status-step ${cls}" aria-label="${escapeHtml(s)}${isCurrent ? ' (current)' : isDone ? ' (completed)' : ''}">
+      <div class="status-step ${cls}"
+           aria-label="${escapeHtml(s)}${isCurrent ? ' (current)' : isDone ? ' (completed)' : ''}">
         <div class="status-step__dot" aria-hidden="true"></div>
         <span class="status-step__label">${escapeHtml(s)}</span>
       </div>
@@ -434,16 +394,14 @@ function buildStatusTrack(currentStatus) {
 // ── Badge helpers ──────────────────────────────────────────────────────────
 
 function getPriorityBadgeClass(priority) {
-  const map = { Critical: 'badge--critical', High: 'badge--high', Medium: 'badge--medium', Low: 'badge--low' };
-  return map[priority] || 'badge--low';
+  return { Critical: 'badge--critical', High: 'badge--high', Medium: 'badge--medium', Low: 'badge--low' }[priority] || 'badge--low';
 }
 
 function getStatusBadgeClass(status) {
-  const map = {
+  return {
     Reported:      'badge--status-reported',
     Active:        'badge--status-active',
     'In Progress': 'badge--status-inprogress',
     Resolved:      'badge--status-resolved',
-  };
-  return map[status] || 'badge--status-reported';
+  }[status] || 'badge--status-reported';
 }

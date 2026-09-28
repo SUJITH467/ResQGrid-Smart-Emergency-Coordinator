@@ -2,61 +2,63 @@
  * app.js
  * ------
  * ResQGrid application entry point.
- * Initialises the store, registers routes, and starts the router.
  *
- * Phase 2B: Incident Management wired in.
- * Phases 3-5 placeholders remain for future implementation.
+ * Phase 3: Resource Management wired in.
  */
 
-import { initStore, isLocalStorageAvailable }    from './store.js';
-import { initRouter, registerRoute }             from './router.js';
-import { logger }                                from './utils.js';
-import { getAllIncidents }                        from './services/incidentService.js';
+import { initStore, isLocalStorageAvailable }     from './store.js';
+import { initRouter, registerRoute }              from './router.js';
+import { logger }                                 from './utils.js';
+import { getAllIncidents }                         from './services/incidentService.js';
+import { getAllResources, repairOrphans }          from './services/resourceService.js';
+import { registerReleaseHook }                    from './services/incidentService.js';
+import { releaseResource }                        from './services/resourceService.js';
 
 // Phase 2B: Incident UI modules.
-import { renderIncidentForm }    from './ui/incidentForm.js';
-import { renderIncidentList, refreshIncidentList } from './ui/incidentList.js';
-import { renderIncidentDetail }  from './ui/incidentDetail.js';
+import { renderIncidentForm }                        from './ui/incidentForm.js';
+import { renderIncidentList, refreshIncidentList }   from './ui/incidentList.js';
+import { renderIncidentDetail }                      from './ui/incidentDetail.js';
+
+// Phase 3: Resource UI modules.
+import { renderResourceList, refreshResourceList }  from './ui/resourceList.js';
+import { renderResourceForm }                       from './ui/resourceForm.js';
 
 // ── Application initialisation ─────────────────────────────────────────────
 
 function init() {
   logger.info('app: Starting ResQGrid…');
 
+  // 1. Initialise LocalStorage.
   initStore();
 
+  // 2. Storage warning banner.
   if (!isLocalStorageAvailable()) {
     showStorageWarningBanner();
   }
 
-  // Register routes.
+  // 3. Wire the Phase 3 release hook into incidentService.
+  //    When an incident is resolved, incidentService will call
+  //    resourceService.releaseResource for each assigned resource.
+  registerReleaseHook(releaseResource);
+
+  // 4. Repair any orphaned resource references from previous sessions.
+  repairOrphans();
+
+  // 5. Register routes.
   registerRoute('#dashboard', renderDashboard);
   registerRoute('#incidents', renderIncidents);
-  registerRoute('#resources', renderResources);
+  registerRoute('#resources', renderResourcesSection);
   registerRoute('#assistant', renderAssistant);
   registerRoute('#stats',     renderStats);
 
+  // 6. Start the router.
   initRouter();
 
   logger.info('app: Ready.');
 }
 
 // ── Incidents section ──────────────────────────────────────────────────────
-//
-// The incidents section is a single-pane UI with three sub-views:
-//   'list'   → incidentList.js
-//   'form'   → incidentForm.js
-//   'detail' → incidentDetail.js
-//
-// Sub-views are controlled by swapping innerHTML of a sub-pane container.
-// The section header + disclaimer always stay visible.
 
-/**
- * Render the Incidents section.
- * Called by the router each time #incidents is activated.
- *
- * @param {HTMLElement} el
- */
 function renderIncidents(el) {
   el.innerHTML = `
     <div class="section-header">
@@ -66,43 +68,26 @@ function renderIncidents(el) {
       </div>
       <span class="badge badge--prototype">Educational Prototype</span>
     </div>
-
     ${buildPrototypeDisclaimer()}
-
     <div id="incidents-pane"></div>
   `;
-
-  // Start on the list view.
   showListView(el);
 }
 
-/**
- * Show the incident list inside the incidents section.
- * @param {HTMLElement} sectionEl
- */
 function showListView(sectionEl) {
   const pane = sectionEl.querySelector('#incidents-pane');
   if (!pane) return;
   pane.innerHTML = '';
-
   renderIncidentList(
     pane,
-    // onReportNew — switch to the form view.
     () => showFormView(sectionEl),
-    // onViewDetail — switch to the detail view.
     (incident) => showDetailView(sectionEl, incident.id)
   );
 }
 
-/**
- * Show the incident creation form inside the incidents section.
- * @param {HTMLElement} sectionEl
- */
 function showFormView(sectionEl) {
   const pane = sectionEl.querySelector('#incidents-pane');
   if (!pane) return;
-
-  // Build a wrapper with a heading.
   pane.innerHTML = `
     <div class="incident-form-wrapper">
       <div class="section-header" style="margin-bottom: var(--resq-space-6);">
@@ -110,47 +95,32 @@ function showFormView(sectionEl) {
           <h2 class="section-header__title" style="font-size: var(--resq-font-size-2xl);">
             Report New Incident
           </h2>
-          <p class="section-header__subtitle">
-            Fill in the details below. All fields marked * are required.
-          </p>
+          <p class="section-header__subtitle">Fill in the details below. All fields marked * are required.</p>
         </div>
       </div>
       <div id="incident-form-container"></div>
     </div>
   `;
-
   const formContainer = pane.querySelector('#incident-form-container');
   if (!formContainer) return;
-
   renderIncidentForm(formContainer, (newIncident) => {
     if (newIncident) {
-      // Incident created — go back to list.
       showListView(sectionEl);
-      // Also refresh dashboard counts if user navigates there.
       scheduleDashboardRefresh();
     } else {
-      // User cancelled.
       showListView(sectionEl);
     }
   });
 }
 
-/**
- * Show the incident detail view inside the incidents section.
- * @param {HTMLElement} sectionEl
- * @param {string}      incidentId
- */
 function showDetailView(sectionEl, incidentId) {
   const pane = sectionEl.querySelector('#incidents-pane');
   if (!pane) return;
   pane.innerHTML = '';
-
   renderIncidentDetail(
     pane,
     incidentId,
-    // onBack — return to list.
     () => showListView(sectionEl),
-    // onChanged — refresh list counts and dashboard.
     () => {
       refreshIncidentList();
       scheduleDashboardRefresh();
@@ -158,29 +128,95 @@ function showDetailView(sectionEl, incidentId) {
   );
 }
 
+// ── Resources section ──────────────────────────────────────────────────────
+
+function renderResourcesSection(el) {
+  el.innerHTML = `
+    <div class="section-header">
+      <div class="section-header__title-group">
+        <h1 class="section-header__title">Resources</h1>
+        <p class="section-header__subtitle">Manage and deploy emergency resources</p>
+      </div>
+      <span class="badge badge--prototype">Educational Prototype</span>
+    </div>
+    ${buildPrototypeDisclaimer()}
+    <div id="resources-pane"></div>
+  `;
+  showResourceListView(el);
+}
+
+function showResourceListView(sectionEl) {
+  const pane = sectionEl.querySelector('#resources-pane');
+  if (!pane) return;
+  pane.innerHTML = '';
+  renderResourceList(
+    pane,
+    () => showResourceFormView(sectionEl, null),   // Add new
+    (resource) => showResourceFormView(sectionEl, resource), // Edit
+    null  // No detail view needed — all actions are inline on the card
+  );
+}
+
+function showResourceFormView(sectionEl, resource) {
+  const pane = sectionEl.querySelector('#resources-pane');
+  if (!pane) return;
+
+  const isEdit  = resource !== null && resource !== undefined;
+  const heading = isEdit ? `Edit Resource — ${resource.id}` : 'Add New Resource';
+  const sub     = isEdit
+    ? 'Update the name, type, or location of this resource.'
+    : 'Fill in the details below. All fields marked * are required.';
+
+  pane.innerHTML = `
+    <div class="incident-form-wrapper">
+      <div class="section-header" style="margin-bottom: var(--resq-space-6);">
+        <div class="section-header__title-group">
+          <h2 class="section-header__title" style="font-size: var(--resq-font-size-2xl);">
+            ${heading}
+          </h2>
+          <p class="section-header__subtitle">${sub}</p>
+        </div>
+      </div>
+      <div id="resource-form-container"></div>
+    </div>
+  `;
+
+  const formContainer = pane.querySelector('#resource-form-container');
+  if (!formContainer) return;
+
+  renderResourceForm(formContainer, resource ?? null, (savedResource) => {
+    // null means user cancelled; non-null means saved successfully.
+    showResourceListView(sectionEl);
+    scheduleDashboardRefresh();
+  });
+}
+
 // ── Dashboard section ──────────────────────────────────────────────────────
 
-// Flag: set true when incident data changes so dashboard re-reads on next visit.
 let _dashboardDirty = false;
 
-/** Mark the dashboard as needing a data refresh. */
 function scheduleDashboardRefresh() {
   _dashboardDirty = true;
 }
 
-/**
- * Render the Dashboard section with live incident counts.
- * @param {HTMLElement} el
- */
 function renderDashboard(el) {
   _dashboardDirty = false;
 
-  // Read live counts from the service.
-  const all        = getAllIncidents();
-  const total      = all.length;
-  const active     = all.filter((i) => i.status !== 'Resolved').length;
-  const critical   = all.filter((i) => i.priority === 'Critical').length;
-  const resolved   = all.filter((i) => i.status === 'Resolved').length;
+  const incidents  = getAllIncidents();
+  const resources  = getAllResources();
+
+  const total    = incidents.length;
+  const active   = incidents.filter((i) => i.status !== 'Resolved').length;
+  const critical = incidents.filter((i) => i.priority === 'Critical').length;
+  const resolved = incidents.filter((i) => i.status === 'Resolved').length;
+
+  const resAvail = resources.filter((r) => r.status === 'Available').length;
+  const resDep   = resources.filter((r) => r.status === 'Deployed').length;
+  const resMaint = resources.filter((r) => r.status === 'Maintenance').length;
+  const resNonMaint = resAvail + resDep;
+  const utilRate = resNonMaint > 0
+    ? `${Math.round(resDep / resNonMaint * 1000) / 10}%`
+    : 'N/A';
 
   el.innerHTML = `
     <div class="section-header">
@@ -231,37 +267,37 @@ function renderDashboard(el) {
         <div class="summary-card__sub">this session</div>
       </article>
 
-      <article class="summary-card summary-card--available" role="listitem" aria-label="0 Available Resources">
+      <article class="summary-card summary-card--available" role="listitem" aria-label="${resAvail} Available Resources">
         <div class="summary-card__icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/>
             <line x1="12" y1="17" x2="12" y2="21"/>
           </svg>
         </div>
-        <div class="summary-card__value">0</div>
+        <div class="summary-card__value">${resAvail}</div>
         <div class="summary-card__label">Available Resources</div>
         <div class="summary-card__sub">ready for deployment</div>
       </article>
 
-      <article class="summary-card summary-card--deployed" role="listitem" aria-label="0 Deployed Resources">
+      <article class="summary-card summary-card--deployed" role="listitem" aria-label="${resDep} Deployed Resources">
         <div class="summary-card__icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polygon points="3 11 22 2 13 21 11 13 3 11"/>
           </svg>
         </div>
-        <div class="summary-card__value">0</div>
+        <div class="summary-card__value">${resDep}</div>
         <div class="summary-card__label">Deployed Resources</div>
         <div class="summary-card__sub">currently active</div>
       </article>
 
-      <article class="summary-card" role="listitem" aria-label="Resource utilization: N/A">
+      <article class="summary-card" role="listitem" aria-label="Utilization rate: ${utilRate}">
         <div class="summary-card__icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
             <line x1="6" y1="20" x2="6" y2="14"/>
           </svg>
         </div>
-        <div class="summary-card__value">N/A</div>
+        <div class="summary-card__value">${utilRate}</div>
         <div class="summary-card__label">Utilization Rate</div>
         <div class="summary-card__sub">deployed / operational</div>
       </article>
@@ -349,31 +385,7 @@ function renderDashboard(el) {
   `;
 }
 
-// ── Placeholder routes (Phases 3–5) ───────────────────────────────────────
-
-function renderResources(el) {
-  el.innerHTML = `
-    <div class="section-header">
-      <div class="section-header__title-group">
-        <h1 class="section-header__title">Resources</h1>
-        <p class="section-header__subtitle">Manage and deploy emergency resources</p>
-      </div>
-      <span class="badge badge--prototype">Educational Prototype</span>
-    </div>
-    ${buildPrototypeDisclaimer()}
-    <div class="empty-state">
-      <div class="empty-state__icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/>
-          <line x1="12" y1="17" x2="12" y2="21"/>
-        </svg>
-      </div>
-      <h2 class="empty-state__heading">Resource Management</h2>
-      <p class="empty-state__message">Add, track, and deploy emergency resources. Coming in Phase 3.</p>
-      <p class="empty-state__detail">add resources · assign to incidents · track availability</p>
-    </div>
-  `;
-}
+// ── Placeholder routes (Phases 4–5) ───────────────────────────────────────
 
 function renderAssistant(el) {
   el.innerHTML = `

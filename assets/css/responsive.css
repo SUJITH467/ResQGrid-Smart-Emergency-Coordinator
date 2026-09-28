@@ -326,3 +326,102 @@
     align-items:    flex-start;
   }
 }
+
+/* =============================================================================
+   Resource Management — Phase 3 responsive overrides
+   ============================================================================= */
+
+/* ── Below 1024px ────────────────────────────────────────────────────────────── */
+@media (max-width: 1023px) {
+  .resource-summary__strip {
+    gap: var(--resq-space-4);
+  }
+
+  .assignment-panel__filter {
+    flex-direction: column;
+    align-items:    stretch;
+  }
+
+  .assignment-panel__select {
+    width:     100%;
+    min-width: 0;
+  }
+}
+
+/* ── Below 768px (mobile) ────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  /* Resource form: single column */
+  .resource-form__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .resource-form__full-width {
+    grid-column: 1;
+  }
+
+  .resource-form {
+    padding: var(--resq-space-4);
+  }
+
+  /* Resource cards: tighter padding */
+  .resource-card__header,
+  .resource-card__body,
+  .resource-card__footer {
+    padding-left:  var(--resq-space-4);
+    padding-right: var(--resq-space-4);
+  }
+
+  .resource-card__footer {
+    flex-direction: column;
+    align-items:    stretch;
+  }
+
+  .resource-card__footer .btn {
+    width:           100%;
+    justify-content: center;
+  }
+
+  /* Assignment panel */
+  .assignment-panel {
+    padding: var(--resq-space-4);
+  }
+
+  .assignment-panel__available-item {
+    flex-direction: column;
+    align-items:    flex-start;
+  }
+
+  .assignment-panel__available-item .btn {
+    width:           100%;
+    justify-content: center;
+  }
+
+  .assignment-panel__assigned-item {
+    flex-direction: column;
+    align-items:    flex-start;
+  }
+
+  .assignment-panel__assigned-item .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ── Below 480px ─────────────────────────────────────────────────────────────── */
+@media (max-width: 479px) {
+  .resource-form__actions {
+    flex-direction: column;
+    align-items:    stretch;
+  }
+
+  .resource-form__actions .btn {
+    width:           100%;
+    justify-content: center;
+  }
+
+  .resource-summary__strip {
+    flex-direction: column;
+    align-items:    flex-start;
+    gap:            var(--resq-space-2);
+  }
+}

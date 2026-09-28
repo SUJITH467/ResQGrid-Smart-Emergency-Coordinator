@@ -1115,3 +1115,354 @@
   color:         var(--resq-color-text-secondary);
   margin-bottom: var(--resq-space-4);
 }
+
+/* =============================================================================
+   Resource Management — Phase 3 components
+   ============================================================================= */
+
+/* ── Resource summary strip ──────────────────────────────────────────────────── */
+.resource-summary {
+  margin-bottom: var(--resq-space-4);
+}
+
+.resource-summary__strip {
+  display:     flex;
+  align-items: center;
+  gap:         var(--resq-space-5);
+  padding:     var(--resq-space-3) var(--resq-space-5);
+  background:  var(--resq-color-surface);
+  border:      1px solid var(--resq-color-border);
+  border-radius: var(--resq-radius-lg);
+  flex-wrap:   wrap;
+}
+
+.resource-summary__item {
+  display:     flex;
+  align-items: center;
+  gap:         var(--resq-space-2);
+  font-size:   var(--resq-font-size-sm);
+  font-weight: var(--resq-font-weight-medium);
+  color:       var(--resq-color-text-secondary);
+}
+
+.resource-summary__dot {
+  width:         10px;
+  height:        10px;
+  border-radius: var(--resq-radius-full);
+  flex-shrink:   0;
+}
+
+.resource-summary__item--available .resource-summary__dot { background: var(--resq-color-status-available); }
+.resource-summary__item--deployed  .resource-summary__dot { background: var(--resq-color-status-deployed); }
+.resource-summary__item--maintenance .resource-summary__dot { background: var(--resq-color-status-maintenance); }
+
+/* ── Resource list ───────────────────────────────────────────────────────────── */
+.resource-list {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--resq-space-3);
+}
+
+/* ── Resource card ───────────────────────────────────────────────────────────── */
+.resource-card {
+  background:    var(--resq-color-surface);
+  border:        1px solid var(--resq-color-border);
+  border-left:   4px solid var(--resq-color-border);
+  border-radius: var(--resq-radius-lg);
+  box-shadow:    var(--resq-shadow-sm);
+  overflow:      hidden;
+  transition:    box-shadow var(--resq-transition-fast),
+                 transform  var(--resq-transition-fast);
+}
+
+.resource-card:hover {
+  box-shadow: var(--resq-shadow-md);
+  transform:  translateY(-1px);
+}
+
+.resource-card--available   { border-left-color: var(--resq-color-status-available); }
+.resource-card--deployed    { border-left-color: var(--resq-color-status-deployed); }
+.resource-card--maintenance { border-left-color: var(--resq-color-status-maintenance); }
+
+.resource-card__header {
+  padding:       var(--resq-space-4) var(--resq-space-5);
+  border-bottom: 1px solid var(--resq-color-border);
+}
+
+.resource-card__id-row {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             var(--resq-space-2);
+  margin-bottom:   var(--resq-space-2);
+  flex-wrap:       wrap;
+}
+
+.resource-card__id {
+  font-size:      var(--resq-font-size-xs);
+  font-weight:    var(--resq-font-weight-semibold);
+  color:          var(--resq-color-text-muted);
+  font-family:    var(--resq-font-mono);
+  letter-spacing: 0.05em;
+}
+
+.resource-card__badges {
+  display:     flex;
+  align-items: center;
+  gap:         var(--resq-space-1);
+  flex-wrap:   wrap;
+}
+
+.resource-card__name {
+  font-size:     var(--resq-font-size-md);
+  font-weight:   var(--resq-font-weight-semibold);
+  color:         var(--resq-color-text);
+  line-height:   var(--resq-line-height-tight);
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  white-space:   nowrap;
+}
+
+.resource-card__body {
+  padding: var(--resq-space-3) var(--resq-space-5);
+}
+
+.resource-card__meta {
+  display:     flex;
+  align-items: center;
+  gap:         var(--resq-space-4);
+  flex-wrap:   wrap;
+}
+
+.resource-card__meta-item {
+  display:     inline-flex;
+  align-items: center;
+  gap:         var(--resq-space-1);
+  font-size:   var(--resq-font-size-xs);
+  color:       var(--resq-color-text-muted);
+}
+
+.resource-card__meta-item--deployed {
+  color:       var(--resq-color-status-deployed);
+  font-weight: var(--resq-font-weight-medium);
+}
+
+.resource-card__footer {
+  padding:     var(--resq-space-3) var(--resq-space-5);
+  border-top:  1px solid var(--resq-color-border);
+  background:  var(--resq-color-surface-raised);
+  display:     flex;
+  align-items: center;
+  gap:         var(--resq-space-2);
+  flex-wrap:   wrap;
+}
+
+.resource-card__no-delete {
+  font-size:  var(--resq-font-size-xs);
+  color:      var(--resq-color-text-muted);
+  font-style: italic;
+  margin-left: var(--resq-space-1);
+}
+
+/* ── Resource form ───────────────────────────────────────────────────────────── */
+.resource-form {
+  background:    var(--resq-color-surface);
+  border:        1px solid var(--resq-color-border);
+  border-radius: var(--resq-radius-lg);
+  padding:       var(--resq-space-6);
+  box-shadow:    var(--resq-shadow-sm);
+  max-width:     640px;
+}
+
+.resource-form__grid {
+  display:               grid;
+  grid-template-columns: 1fr 1fr;
+  gap:                   0 var(--resq-space-6);
+}
+
+.resource-form__full-width {
+  grid-column: 1 / -1;
+}
+
+.resource-form__actions {
+  display:     flex;
+  align-items: center;
+  gap:         var(--resq-space-3);
+  padding-top: var(--resq-space-4);
+  border-top:  1px solid var(--resq-color-border);
+  margin-top:  var(--resq-space-2);
+}
+
+/* ── Assignment panel ────────────────────────────────────────────────────────── */
+.assignment-panel {
+  background:    var(--resq-color-surface);
+  border:        1px solid var(--resq-color-border);
+  border-radius: var(--resq-radius-lg);
+  padding:       var(--resq-space-5);
+  box-shadow:    var(--resq-shadow-sm);
+}
+
+.assignment-panel__header {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             var(--resq-space-3);
+  margin-bottom:   var(--resq-space-4);
+}
+
+.assignment-panel__heading {
+  font-size:   var(--resq-font-size-md);
+  font-weight: var(--resq-font-weight-semibold);
+  color:       var(--resq-color-text);
+}
+
+.assignment-panel__incident-id {
+  font-size:      var(--resq-font-size-xs);
+  font-weight:    var(--resq-font-weight-semibold);
+  color:          var(--resq-color-text-muted);
+  font-family:    var(--resq-font-mono);
+  letter-spacing: 0.05em;
+}
+
+.assignment-panel__sub-heading {
+  font-size:     var(--resq-font-size-sm);
+  font-weight:   var(--resq-font-weight-semibold);
+  color:         var(--resq-color-text);
+  margin-bottom: var(--resq-space-3);
+}
+
+.assignment-panel__hint {
+  font-size:     var(--resq-font-size-sm);
+  color:         var(--resq-color-text-secondary);
+  margin-bottom: var(--resq-space-4);
+  line-height:   var(--resq-line-height-normal);
+}
+
+/* Currently assigned list */
+.assignment-panel__assigned {
+  margin-bottom: var(--resq-space-5);
+  padding:       var(--resq-space-4);
+  background:    var(--resq-color-status-deployed-bg);
+  border:        1px solid var(--resq-color-low-border);
+  border-radius: var(--resq-radius-md);
+}
+
+.assignment-panel__assigned-list {
+  list-style:    none;
+  display:       flex;
+  flex-direction: column;
+  gap:           var(--resq-space-2);
+}
+
+.assignment-panel__assigned-item {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             var(--resq-space-3);
+  flex-wrap:       wrap;
+}
+
+.assignment-panel__assigned-info {
+  display:     flex;
+  align-items: center;
+  gap:         var(--resq-space-2);
+  flex-wrap:   wrap;
+}
+
+.assignment-panel__assigned-name {
+  font-size:   var(--resq-font-size-sm);
+  font-weight: var(--resq-font-weight-medium);
+  color:       var(--resq-color-text);
+}
+
+.assignment-panel__no-assigned {
+  font-size:     var(--resq-font-size-sm);
+  color:         var(--resq-color-text-muted);
+  font-style:    italic;
+  margin-bottom: var(--resq-space-5);
+}
+
+/* Add section */
+.assignment-panel__add-section {
+  border-top:  1px solid var(--resq-color-border);
+  padding-top: var(--resq-space-4);
+}
+
+.assignment-panel__filter {
+  display:     flex;
+  align-items: center;
+  gap:         var(--resq-space-3);
+  margin-bottom: var(--resq-space-4);
+  flex-wrap:   wrap;
+}
+
+.assignment-panel__select {
+  min-width: 180px;
+}
+
+/* Available resources list */
+.assignment-panel__available-list {
+  list-style:    none;
+  display:       flex;
+  flex-direction: column;
+  gap:           var(--resq-space-2);
+}
+
+.assignment-panel__available-item {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             var(--resq-space-3);
+  padding:         var(--resq-space-3) var(--resq-space-4);
+  background:      var(--resq-color-surface-raised);
+  border:          1px solid var(--resq-color-border);
+  border-radius:   var(--resq-radius-md);
+  flex-wrap:       wrap;
+  transition:      background var(--resq-transition-fast);
+}
+
+.assignment-panel__available-item:hover {
+  background: var(--resq-color-info-bg);
+  border-color: var(--resq-color-brand-accent);
+}
+
+.assignment-panel__available-info {
+  display:     flex;
+  align-items: center;
+  gap:         var(--resq-space-2);
+  flex-wrap:   wrap;
+  flex:        1;
+}
+
+.assignment-panel__available-name {
+  font-size:   var(--resq-font-size-sm);
+  font-weight: var(--resq-font-weight-semibold);
+  color:       var(--resq-color-text);
+}
+
+.assignment-panel__location {
+  display:     inline-flex;
+  align-items: center;
+  gap:         var(--resq-space-1);
+  font-size:   var(--resq-font-size-xs);
+  color:       var(--resq-color-text-muted);
+}
+
+.assignment-panel__no-resources {
+  font-size:  var(--resq-font-size-sm);
+  color:      var(--resq-color-text-muted);
+  font-style: italic;
+  padding:    var(--resq-space-4);
+  text-align: center;
+  background: var(--resq-color-surface-raised);
+  border:     1px dashed var(--resq-color-border);
+  border-radius: var(--resq-radius-md);
+}
+
+/* ── Incident detail resource ID display ─────────────────────────────────────── */
+.incident-detail__resource-id {
+  font-size:      var(--resq-font-size-xs);
+  color:          var(--resq-color-text-muted);
+  font-family:    var(--resq-font-mono);
+  margin-left:    auto;
+}

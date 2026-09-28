@@ -28,6 +28,23 @@ import {
   PRIORITY_ORDER,
 } from '../utils.js';
 
+// Lazy import to avoid circular dependency.
+// resourceService imports incidentService for atomic writes;
+// we import resourceService here only for the resolve hook.
+// We use a dynamic approach: the reference is set by app.js after both
+// services are loaded.
+let _releaseResource = null;
+
+/**
+ * Register the resource release function.
+ * Called once from app.js after resourceService is imported.
+ *
+ * @param {Function} fn - resourceService.releaseResource
+ */
+export function registerReleaseHook(fn) {
+  _releaseResource = fn;
+}
+
 // ── Constants ──────────────────────────────────────────────────────────────
 
 /** Character limits from the spec (section 5). */
@@ -313,9 +330,18 @@ export function updateIncidentStatus(id, newStatus) {
     resolvedAt: newStatus === 'Resolved' ? now : incident.resolvedAt,
   };
 
-  // Phase 3 hook: when Resolved, resourceService will be called here
-  // to release all assigned resources.  Placeholder comment preserved.
-  // if (newStatus === 'Resolved') { releaseAllResources(incident); }
+  // Phase 3 hook: release all assigned resources when an incident is Resolved.
+  if (newStatus === 'Resolved' && _releaseResource) {
+    const toRelease = incident.assignedResources || [];
+    toRelease.forEach((resourceId) => {
+      _releaseResource(resourceId);
+    });
+    // Clear the assignedResources list on the incident after releasing.
+    incidents[index] = {
+      ...incidents[index],
+      assignedResources: [],
+    };
+  }
 
   const saved = writeAll(incidents);
   if (!saved) {
