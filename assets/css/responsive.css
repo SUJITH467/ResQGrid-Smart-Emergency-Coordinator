@@ -425,3 +425,59 @@
     gap:            var(--resq-space-2);
   }
 }
+
+
+/* =============================================================================
+   Phase 4 — Decision-Support Assistant responsive overrides
+   ============================================================================= */
+
+/* ── Below 768px (mobile) ────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .assistant-panel__input-actions {
+    flex-direction: column;
+    align-items:    stretch;
+  }
+
+  .assistant-panel__input-actions .btn {
+    width:           100%;
+    justify-content: center;
+  }
+
+  .assistant-result__field {
+    flex-direction: column;
+    gap:            var(--resq-space-2);
+  }
+
+  .assistant-result__field-label {
+    min-width: unset;
+  }
+
+  .assistant-result__actions {
+    flex-direction: column;
+    align-items:    stretch;
+  }
+
+  .assistant-result__actions .btn {
+    width:           100%;
+    justify-content: center;
+  }
+
+  .assistant-confidence {
+    align-self: flex-start;
+  }
+}
+
+/* ── Below 480px ─────────────────────────────────────────────────────────────── */
+@media (max-width: 479px) {
+  .assistant-panel__input-section {
+    padding: var(--resq-space-4);
+  }
+
+  .assistant-result {
+    padding: var(--resq-space-4);
+  }
+
+  .assistant-resource-fieldset {
+    flex-direction: column;
+  }
+}

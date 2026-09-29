@@ -4,6 +4,7 @@
  * ResQGrid application entry point.
  *
  * Phase 3: Resource Management wired in.
+ * Phase 4: Decision-Support Assistant wired in.
  */
 
 import { initStore, isLocalStorageAvailable }     from './store.js';
@@ -22,6 +23,13 @@ import { renderIncidentDetail }                      from './ui/incidentDetail.j
 // Phase 3: Resource UI modules.
 import { renderResourceList, refreshResourceList }  from './ui/resourceList.js';
 import { renderResourceForm }                       from './ui/resourceForm.js';
+
+// Phase 4: Assistant UI module.
+import { renderAssistantPanel }                     from './ui/assistantPanel.js';
+
+// ── Prefill state (assistant → incident form transfer) ─────────────────────
+// Set by the assistant panel on accept; consumed once by showFormView.
+let _pendingPrefill = null;
 
 // ── Application initialisation ─────────────────────────────────────────────
 
@@ -103,6 +111,11 @@ function showFormView(sectionEl) {
   `;
   const formContainer = pane.querySelector('#incident-form-container');
   if (!formContainer) return;
+
+  // Consume any pending prefill from the assistant (one-time transfer).
+  const prefill   = _pendingPrefill;
+  _pendingPrefill = null;
+
   renderIncidentForm(formContainer, (newIncident) => {
     if (newIncident) {
       showListView(sectionEl);
@@ -110,7 +123,7 @@ function showFormView(sectionEl) {
     } else {
       showListView(sectionEl);
     }
-  });
+  }, prefill);
 }
 
 function showDetailView(sectionEl, incidentId) {
@@ -123,6 +136,7 @@ function showDetailView(sectionEl, incidentId) {
     () => showListView(sectionEl),
     () => {
       refreshIncidentList();
+      refreshResourceList();   // sync resource list after assign/release from detail
       scheduleDashboardRefresh();
     }
   );
@@ -392,28 +406,31 @@ function renderAssistant(el) {
     <div class="section-header">
       <div class="section-header__title-group">
         <h1 class="section-header__title">Decision-Support Assistant</h1>
-        <p class="section-header__subtitle">Rule-based incident classification tool</p>
+        <p class="section-header__subtitle">Rule-based incident classification — not AI</p>
       </div>
       <span class="badge badge--prototype">Prototype — Not AI</span>
     </div>
-    <div class="alert alert--warning" role="note">
-      <strong>Prototype Notice:</strong> The Decision-Support Assistant uses keyword matching rules,
-      not artificial intelligence. All suggestions are advisory only.
-      <strong>Do not use in real emergencies.</strong>
-    </div>
-    <div class="empty-state">
-      <div class="empty-state__icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-        </svg>
-      </div>
-      <h2 class="empty-state__heading">Decision-Support Assistant (Prototype)</h2>
-      <p class="empty-state__message">
-        Analyze a plain-language incident description and get a classification suggestion. Coming in Phase 4.
-      </p>
-    </div>
+    <div id="assistant-panel-mount"></div>
   `;
+
+  const mount = el.querySelector('#assistant-panel-mount');
+  if (!mount) return;
+
+  renderAssistantPanel(mount, (payload) => {
+    // Coordinator accepted a suggestion — store prefill and navigate to form.
+    _pendingPrefill = payload;
+    // Navigate to incidents section; showFormView will consume _pendingPrefill.
+    window.location.hash = '#incidents';
+    // The router will call renderIncidents → showListView → user clicks "Report Incident"
+    // → showFormView picks up _pendingPrefill. But for smoother UX we directly open
+    // the form after a short tick so the route change has settled.
+    setTimeout(() => {
+      const incSection = document.getElementById('section-incidents');
+      if (incSection) {
+        showFormView(incSection);
+      }
+    }, 50);
+  });
 }
 
 function renderStats(el) {

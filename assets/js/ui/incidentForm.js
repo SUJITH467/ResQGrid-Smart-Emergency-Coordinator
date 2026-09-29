@@ -32,15 +32,21 @@ import { showToast } from './toast.js';
  *
  * @param {HTMLElement} container   - Target element to render into
  * @param {Function}    onSuccess   - Called with the new incident object after creation
+ * @param {Object|null} [prefill]   - Optional { type, priority, description } from assistant
  */
-export function renderIncidentForm(container, onSuccess) {
-  container.innerHTML = buildFormHTML();
+export function renderIncidentForm(container, onSuccess, prefill = null) {
+  container.innerHTML = buildFormHTML(prefill);
   attachFormListeners(container, onSuccess);
+
+  // If prefill values were provided, apply them now and mark fields visually.
+  if (prefill) {
+    applyPrefill(container, prefill);
+  }
 }
 
 // ── HTML builder ───────────────────────────────────────────────────────────
 
-function buildFormHTML() {
+function buildFormHTML(prefill = null) {
   // Build <option> lists for the select fields.
   const typeOptions = INCIDENT_TYPES.map(
     (t) => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`
@@ -486,4 +492,71 @@ function showDuplicateWarning(form, message) {
 function hideDuplicateWarning(form) {
   const banner = document.getElementById('dup-warning');
   if (banner) banner.hidden = true;
+}
+
+// ── Prefill (from Decision-Support Assistant) ──────────────────────────────
+
+/**
+ * Apply assistant transfer payload values to the form fields.
+ * Marks pre-filled fields with .field--prefilled for visual indication.
+ * Only type, priority and description are pre-filled — per spec section 9.
+ *
+ * @param {HTMLElement} container
+ * @param {{ type: string, priority: string, description: string }} prefill
+ */
+function applyPrefill(container, prefill) {
+  if (!prefill) return;
+
+  const PREFILL_NOTE = 'Pre-filled by Decision-Support Assistant — you can edit this field.';
+
+  // Description textarea
+  if (prefill.description) {
+    const desc = container.querySelector('[name="description"]');
+    if (desc) {
+      desc.value = prefill.description;
+      desc.classList.add('field--prefilled');
+      desc.setAttribute('title', PREFILL_NOTE);
+    }
+  }
+
+  // Type select
+  if (prefill.type) {
+    const typeEl = container.querySelector('[name="type"]');
+    if (typeEl) {
+      typeEl.value = prefill.type;
+      typeEl.classList.add('field--prefilled');
+      typeEl.setAttribute('title', PREFILL_NOTE);
+    }
+  }
+
+  // Priority select
+  if (prefill.priority) {
+    const priorityEl = container.querySelector('[name="priority"]');
+    if (priorityEl) {
+      priorityEl.value = prefill.priority;
+      priorityEl.classList.add('field--prefilled');
+      priorityEl.setAttribute('title', PREFILL_NOTE);
+    }
+  }
+
+  // Show a non-intrusive info banner at the top of the form
+  const form = container.querySelector('#incident-form');
+  if (form) {
+    const banner = document.createElement('div');
+    banner.className = 'alert alert--info assistant-prefill-banner';
+    banner.setAttribute('role', 'note');
+    banner.innerHTML = `
+      <svg class="alert__icon" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span>
+        Some fields were pre-filled by the <strong>Decision-Support Assistant</strong>.
+        Review and adjust them before submitting.
+      </span>
+    `;
+    form.insertBefore(banner, form.firstChild);
+  }
 }
