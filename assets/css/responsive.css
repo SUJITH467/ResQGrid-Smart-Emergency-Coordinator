@@ -481,3 +481,90 @@
     flex-direction: column;
   }
 }
+
+
+/* =============================================================================
+   Phase 5 — Statistics Dashboard responsive overrides
+   ============================================================================= */
+
+/* ── Below 1024px ────────────────────────────────────────────────────────────── */
+@media (max-width: 1023px) {
+  .stats-resolution__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Below 768px (mobile) ────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .stats-charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-resolution__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-toolbar {
+    justify-content: space-between;
+  }
+
+  /* Bar table: stacked card layout at mobile */
+  .stat-table thead {
+    display: none;        /* hide column headers — content provided via data-label */
+  }
+
+  .stat-table,
+  .stat-table tbody,
+  .stat-table tr,
+  .stat-table td {
+    display: block;
+    width:   100%;
+  }
+
+  .stat-table tbody tr {
+    padding:       var(--resq-space-3) 0;
+    border-bottom: 1px solid var(--resq-color-border);
+  }
+
+  .stat-table td {
+    padding:    var(--resq-space-1) 0;
+    text-align: left;
+  }
+
+  /* Show data-label as a prefix */
+  .stat-table td[data-label]::before {
+    content:     attr(data-label) ": ";
+    font-weight: var(--resq-font-weight-semibold);
+    font-size:   var(--resq-font-size-xs);
+    color:       var(--resq-color-text-muted);
+    display:     inline;
+  }
+
+  .stat-table__bar {
+    min-width: auto;
+    margin-top: var(--resq-space-1);
+  }
+
+  .stat-table tfoot {
+    display: block;
+  }
+
+  .stat-table tfoot tr {
+    display:       flex;
+    gap:           var(--resq-space-3);
+    padding-top:   var(--resq-space-2);
+    border-top:    2px solid var(--resq-color-border);
+    border-bottom: none;
+  }
+}
+
+/* ── Below 480px ─────────────────────────────────────────────────────────────── */
+@media (max-width: 479px) {
+  .stats-chart-block {
+    padding: var(--resq-space-4);
+  }
+
+  .stats-resolution__value {
+    font-size: var(--resq-font-size-xl);
+  }
+}

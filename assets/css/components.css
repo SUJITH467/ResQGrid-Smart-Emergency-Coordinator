@@ -1777,3 +1777,262 @@
   margin-bottom: var(--resq-space-5);
   font-size:     var(--resq-font-size-sm);
 }
+
+
+/* =============================================================================
+   Phase 5 — Statistics Dashboard components
+   ============================================================================= */
+
+/* ── Stats toolbar (Refresh button + Updated-at label) ──────────────────────── */
+.stats-toolbar {
+  display:         flex;
+  align-items:     center;
+  justify-content: flex-end;
+  gap:             var(--resq-space-3);
+  margin-bottom:   var(--resq-space-5);
+  flex-wrap:       wrap;
+}
+
+/* Left-hand side of toolbar — holds the "Updated at" label */
+.stats-toolbar__meta {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.stats-toolbar__updated {
+  font-size:  var(--resq-font-size-xs);
+  color:      var(--resq-color-text-muted);
+  font-style: italic;
+}
+
+/* ── Section headings ────────────────────────────────────────────────────────── */
+.stats-section {
+  margin-bottom: var(--resq-space-10);
+}
+
+.stats-section__heading {
+  font-size:     var(--resq-font-size-xl);
+  font-weight:   var(--resq-font-weight-semibold);
+  color:         var(--resq-color-text);
+  margin-bottom: var(--resq-space-5);
+  padding-bottom: var(--resq-space-3);
+  border-bottom: 1px solid var(--resq-color-border);
+}
+
+/* ── Charts grid (two-column on tablet+, single on mobile) ──────────────────── */
+.stats-charts-grid {
+  display:               grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap:                   var(--resq-space-6);
+}
+
+.stats-chart-block {
+  background:    var(--resq-color-surface);
+  border:        1px solid var(--resq-color-border);
+  border-radius: var(--resq-radius-lg);
+  padding:       var(--resq-space-5);
+  box-shadow:    var(--resq-shadow-sm);
+}
+
+.stats-chart-block__title {
+  font-size:     var(--resq-font-size-sm);
+  font-weight:   var(--resq-font-weight-semibold);
+  color:         var(--resq-color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: var(--resq-space-4);
+}
+
+/* ── Bar chart table ─────────────────────────────────────────────────────────── */
+.stat-table {
+  width:           100%;
+  border-collapse: collapse;
+  font-size:       var(--resq-font-size-sm);
+}
+
+.stat-table thead th {
+  text-align:     left;
+  font-size:      var(--resq-font-size-xs);
+  font-weight:    var(--resq-font-weight-semibold);
+  color:          var(--resq-color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-bottom: var(--resq-space-2);
+  border-bottom:  1px solid var(--resq-color-border);
+}
+
+.stat-table tbody tr {
+  border-bottom: 1px solid var(--resq-color-border);
+}
+
+.stat-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.stat-table td {
+  padding:     var(--resq-space-2) var(--resq-space-1);
+  vertical-align: middle;
+}
+
+.stat-table__label {
+  color:       var(--resq-color-text);
+  font-weight: var(--resq-font-weight-medium);
+  white-space: nowrap;
+  padding-right: var(--resq-space-3);
+  min-width:   120px;
+}
+
+.stat-table__count {
+  color:      var(--resq-color-text);
+  text-align: right;
+  padding-right: var(--resq-space-3);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-table__pct {
+  color:      var(--resq-color-text-muted);
+  text-align: right;
+  padding-right: var(--resq-space-3);
+  white-space: nowrap;
+  min-width:  48px;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-table__bar {
+  width:    100%;
+  min-width: 80px;
+}
+
+.stat-table tfoot td {
+  padding-top:  var(--resq-space-2);
+  border-top:   2px solid var(--resq-color-border);
+  font-weight:  var(--resq-font-weight-semibold);
+  font-size:    var(--resq-font-size-xs);
+  color:        var(--resq-color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-table__total-count {
+  text-align: right;
+  padding-right: var(--resq-space-3);
+}
+
+.stat-table__total-label {
+  padding-right: var(--resq-space-3);
+}
+
+/* ── Bar track + fills ───────────────────────────────────────────────────────── */
+.stat-bar-track {
+  width:         100%;
+  height:        10px;
+  background:    var(--resq-color-surface-raised);
+  border-radius: var(--resq-radius-full);
+  overflow:      hidden;
+}
+
+.stat-bar-fill {
+  height:        100%;
+  border-radius: var(--resq-radius-full);
+  max-width:     100%;
+  min-width:     0;
+  transition:    width var(--resq-transition-normal);
+}
+
+/* Incident type fills */
+.stat-bar-fill--fire        { background: var(--resq-color-type-fire); }
+.stat-bar-fill--medical     { background: var(--resq-color-type-medical); }
+.stat-bar-fill--security    { background: var(--resq-color-type-security); }
+.stat-bar-fill--hazmat      { background: var(--resq-color-type-hazmat); }
+.stat-bar-fill--natural     { background: var(--resq-color-type-natural); }
+.stat-bar-fill--other       { background: var(--resq-color-type-other); }
+
+/* Priority fills */
+.stat-bar-fill--critical    { background: var(--resq-color-critical); }
+.stat-bar-fill--high        { background: var(--resq-color-high); }
+.stat-bar-fill--medium      { background: var(--resq-color-medium); }
+.stat-bar-fill--low         { background: var(--resq-color-low); }
+
+/* Incident status fills */
+.stat-bar-fill--reported    { background: var(--resq-color-status-reported); }
+.stat-bar-fill--active      { background: var(--resq-color-status-active); }
+.stat-bar-fill--inprogress  { background: var(--resq-color-status-inprogress); }
+.stat-bar-fill--resolved    { background: var(--resq-color-status-resolved); }
+
+/* Resource status fills */
+.stat-bar-fill--available   { background: var(--resq-color-status-available); }
+.stat-bar-fill--deployed    { background: var(--resq-color-status-deployed); }
+.stat-bar-fill--maintenance { background: var(--resq-color-status-maintenance); }
+
+/* Resource type — neutral colour (same for all types) */
+.stat-bar-fill--res-type    { background: var(--resq-color-brand-accent); }
+
+/* ── Resolution time section ─────────────────────────────────────────────────── */
+.stats-resolution__grid {
+  display:               grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:                   var(--resq-space-4);
+}
+
+.stats-resolution__item {
+  background:    var(--resq-color-surface);
+  border:        1px solid var(--resq-color-border);
+  border-radius: var(--resq-radius-lg);
+  padding:       var(--resq-space-5);
+  display:       flex;
+  flex-direction: column;
+  gap:           var(--resq-space-2);
+  box-shadow:    var(--resq-shadow-sm);
+}
+
+.stats-resolution__label {
+  font-size:      var(--resq-font-size-xs);
+  font-weight:    var(--resq-font-weight-semibold);
+  color:          var(--resq-color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.stats-resolution__value {
+  font-size:   var(--resq-font-size-2xl);
+  font-weight: var(--resq-font-weight-bold);
+  color:       var(--resq-color-text);
+  line-height: 1;
+}
+
+.stats-resolution__value--fast { color: var(--resq-color-status-resolved); }
+.stats-resolution__value--slow { color: var(--resq-color-warning); }
+
+.stats-resolution__empty {
+  font-size:  var(--resq-font-size-sm);
+  color:      var(--resq-color-text-muted);
+  font-style: italic;
+  padding:    var(--resq-space-4) 0;
+}
+
+/* ── Empty states within stats sections ──────────────────────────────────────── */
+.stats-empty {
+  padding:       var(--resq-space-8) var(--resq-space-6);
+  text-align:    center;
+  background:    var(--resq-color-surface);
+  border:        1px dashed var(--resq-color-border);
+  border-radius: var(--resq-radius-lg);
+}
+
+.stats-empty__message {
+  font-size:  var(--resq-font-size-sm);
+  color:      var(--resq-color-text-muted);
+  line-height: var(--resq-line-height-loose);
+}
+
+.stats-empty__link {
+  color:           var(--resq-color-brand-primary);
+  text-decoration: underline;
+  font-weight:     var(--resq-font-weight-medium);
+}
+
+.stats-empty__link:hover {
+  color: var(--resq-color-brand-secondary);
+}

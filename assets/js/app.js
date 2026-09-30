@@ -27,6 +27,9 @@ import { renderResourceForm }                       from './ui/resourceForm.js';
 // Phase 4: Assistant UI module.
 import { renderAssistantPanel }                     from './ui/assistantPanel.js';
 
+// Phase 5: Statistics UI module.
+import { renderStatsView }                          from './ui/statsView.js';
+
 // ── Prefill state (assistant → incident form transfer) ─────────────────────
 // Set by the assistant panel on accept; consumed once by showFormView.
 let _pendingPrefill = null;
@@ -443,17 +446,11 @@ function renderStats(el) {
       <span class="badge badge--prototype">Educational Prototype</span>
     </div>
     ${buildPrototypeDisclaimer()}
-    <div class="empty-state">
-      <div class="empty-state__icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
-          <line x1="6" y1="20" x2="6" y2="14"/>
-        </svg>
-      </div>
-      <h2 class="empty-state__heading">Statistics Dashboard</h2>
-      <p class="empty-state__message">Live metrics from incident and resource data. Coming in Phase 5.</p>
-    </div>
+    <div id="stats-view-mount"></div>
   `;
+
+  const mount = el.querySelector('#stats-view-mount');
+  if (mount) renderStatsView(mount);
 }
 
 // ── Shared helpers ─────────────────────────────────────────────────────────
