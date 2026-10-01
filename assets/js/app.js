@@ -10,10 +10,8 @@
 import { initStore, isLocalStorageAvailable }     from './store.js';
 import { initRouter, registerRoute }              from './router.js';
 import { logger }                                 from './utils.js';
-import { getAllIncidents }                         from './services/incidentService.js';
-import { getAllResources, repairOrphans }          from './services/resourceService.js';
-import { registerReleaseHook }                    from './services/incidentService.js';
-import { releaseResource }                        from './services/resourceService.js';
+import { getAllIncidents, registerReleaseHook }    from './services/incidentService.js';
+import { getAllResources, repairOrphans, releaseResource } from './services/resourceService.js';
 
 // Phase 2B: Incident UI modules.
 import { renderIncidentForm }                        from './ui/incidentForm.js';
