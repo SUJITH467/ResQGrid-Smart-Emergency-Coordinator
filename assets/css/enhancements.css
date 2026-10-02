@@ -1,0 +1,461 @@
+/* =============================================================================
+   enhancements.css
+   ResQGrid UI Design Enhancement — Day 1
+   Layered on top of main.css, components.css and responsive.css.
+   All changes are purely presentational; no JS, no data model changes.
+   Loaded last in index.html so it overrides with higher specificity where needed.
+   ============================================================================= */
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   1. SIDEBAR — refined active state, brand polish, smooth hover
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* Richer sidebar background */
+.sidebar {
+  background:  linear-gradient(180deg, #0a1628 0%, #0f172a 100%);
+  border-right: 1px solid rgba(255,255,255,0.06);
+  box-shadow:   4px 0 24px rgb(0 0 0 / 0.18);
+}
+
+/* Brand area — subtle bottom separator */
+.sidebar__brand {
+  background:   rgba(255,255,255,0.03);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Brand icon — gradient accent */
+.sidebar__brand-icon {
+  background:    linear-gradient(135deg, #3b82f6, #1d4ed8);
+  box-shadow:    0 0 0 3px rgba(59,130,246,0.25);
+}
+
+/* Active nav link — richer blue pill */
+.nav__link--active {
+  background:    linear-gradient(90deg, #1d4ed8, #2563eb);
+  box-shadow:    0 2px 8px rgb(29 78 216 / 0.35);
+  color:         var(--resq-color-white);
+}
+
+/* Active nav link — left accent stripe */
+.nav__link--active::before {
+  content:       '';
+  position:      absolute;
+  left:          0;
+  top:           0;
+  bottom:        0;
+  width:         3px;
+  border-radius: 0 2px 2px 0;
+  background:    #93c5fd;  /* Blue 300 — visible against dark sidebar */
+}
+
+.nav__link {
+  position: relative;  /* needed for ::before */
+}
+
+/* Hover state — slightly lighter than active */
+.nav__link:hover {
+  background: rgba(255,255,255,0.07);
+  color:      var(--resq-color-white);
+}
+
+/* Section label — more visible */
+.nav__section-label {
+  color:          rgba(148,163,184,0.7);
+  letter-spacing: 0.1em;
+}
+
+/* Sidebar footer */
+.sidebar__footer {
+  border-top:  1px solid rgba(255,255,255,0.06);
+  background:  rgba(0,0,0,0.15);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   2. TOPBAR — sharper brand strip with subtle gradient
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.topbar {
+  background:    var(--resq-color-surface);
+  border-bottom: 1px solid var(--resq-color-border);
+  box-shadow:    0 1px 4px rgb(0 0 0 / 0.05);
+}
+
+/* Emergency prototype badge — more prominent */
+.topbar__prototype-label {
+  background:    linear-gradient(135deg, #fef3c7, #fde68a);
+  color:         #92400e;  /* Amber 800 */
+  border-color:  #fcd34d;
+  font-weight:   var(--resq-font-weight-semibold);
+  letter-spacing: 0.03em;
+  box-shadow:    0 1px 3px rgb(0 0 0 / 0.08);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   3. SUMMARY CARDS — deeper shadows, richer left borders, hover lift
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.summary-card {
+  border-left:    4px solid var(--resq-color-border);
+  box-shadow:     0 1px 3px rgb(0 0 0 / 0.06), 0 1px 2px rgb(0 0 0 / 0.04);
+  transition:     box-shadow 200ms ease, transform 200ms ease, border-left-color 200ms ease;
+}
+
+.summary-card:hover {
+  box-shadow:  0 8px 25px rgb(0 0 0 / 0.10), 0 3px 8px rgb(0 0 0 / 0.06);
+  transform:   translateY(-2px);
+}
+
+/* Priority-specific left borders on critical card */
+.summary-card--critical {
+  border-left-color: var(--resq-color-critical);
+  background:        linear-gradient(135deg, #ffffff 60%, #fef2f2 100%);
+}
+
+.summary-card--resolved {
+  border-left-color: var(--resq-color-status-resolved);
+  background:        linear-gradient(135deg, #ffffff 60%, #f0fdf4 100%);
+}
+
+.summary-card--available {
+  border-left-color: var(--resq-color-status-available);
+  background:        linear-gradient(135deg, #ffffff 60%, #f0fdf4 100%);
+}
+
+.summary-card--deployed {
+  border-left-color: var(--resq-color-status-deployed);
+  background:        linear-gradient(135deg, #ffffff 60%, #eff6ff 100%);
+}
+
+/* Summary card icon — tinted backgrounds */
+.summary-card--critical  .summary-card__icon { background: var(--resq-color-critical-bg);              }
+.summary-card--resolved  .summary-card__icon { background: var(--resq-color-status-resolved-bg);       }
+.summary-card--available .summary-card__icon { background: var(--resq-color-status-available-bg);      }
+.summary-card--deployed  .summary-card__icon { background: var(--resq-color-status-deployed-bg);       }
+
+/* Bigger primary value for legibility */
+.summary-card__value {
+  font-size:   var(--resq-font-size-4xl);
+  font-weight: var(--resq-font-weight-bold);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   4. SECTION HEADERS — stronger visual hierarchy
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.section-header__title {
+  font-size:      var(--resq-font-size-2xl);
+  font-weight:    var(--resq-font-weight-bold);
+  letter-spacing: -0.01em;
+  color:          var(--resq-color-text);
+}
+
+.section-header__subtitle {
+  color:     var(--resq-color-text-secondary);
+  font-size: var(--resq-font-size-sm);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   5. PRIORITY & STATUS BADGES — crisper, more distinct
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.badge {
+  font-weight:    var(--resq-font-weight-semibold);
+  letter-spacing: 0.05em;
+  box-shadow:     inset 0 1px 0 rgb(255 255 255 / 0.15);
+}
+
+/* Critical badge — pulsing left border on cards to draw attention */
+.incident-card--critical {
+  border-left:   4px solid var(--resq-color-critical);
+  animation:     critical-pulse 3s ease-in-out infinite;
+}
+
+@keyframes critical-pulse {
+  0%, 100% { border-left-color: var(--resq-color-critical); }
+  50%       { border-left-color: #f87171; /* Red 400 */ }
+}
+
+/* Reduce motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .incident-card--critical {
+    animation: none;
+    border-left-color: var(--resq-color-critical);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   6. INCIDENT & RESOURCE CARDS — refined surfaces, tighter spacing
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.incident-card,
+.resource-card {
+  box-shadow:  0 1px 3px rgb(0 0 0 / 0.06), 0 1px 2px rgb(0 0 0 / 0.04);
+  transition:  box-shadow 200ms ease, transform 200ms ease;
+}
+
+.incident-card:hover,
+.resource-card:hover {
+  box-shadow:  0 6px 20px rgb(0 0 0 / 0.09), 0 2px 6px rgb(0 0 0 / 0.05);
+  transform:   translateY(-1px);
+}
+
+/* Footer area — slightly warmer tint */
+.incident-card__footer,
+.resource-card__footer {
+  background: #f8fafc;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   7. FORMS — improved focus ring and label spacing
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.form-input,
+.form-select,
+.form-textarea {
+  transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  border-color: var(--resq-color-brand-accent);
+  box-shadow:   0 0 0 3px rgb(59 130 246 / 0.18);
+  background:   #fafcff;
+}
+
+/* Pre-filled fields from assistant — clearer tint */
+.field--prefilled {
+  border-color: #0284c7 !important;
+  background:   #f0f9ff !important;
+  box-shadow:   0 0 0 3px rgb(2 132 199 / 0.12) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   8. BUTTONS — improved hover depth and active press
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.btn--primary {
+  background:    linear-gradient(135deg, #2563eb, #1d4ed8);
+  border-color:  #1d4ed8;
+  box-shadow:    0 1px 3px rgb(29 78 216 / 0.3), inset 0 1px 0 rgba(255,255,255,0.12);
+}
+
+.btn--primary:hover {
+  background:    linear-gradient(135deg, #1d4ed8, #1e40af);
+  box-shadow:    0 4px 12px rgb(29 78 216 / 0.35), inset 0 1px 0 rgba(255,255,255,0.12);
+  transform:     translateY(-1px);
+}
+
+.btn--primary:active {
+  transform:  translateY(0);
+  box-shadow: 0 1px 3px rgb(29 78 216 / 0.2);
+}
+
+.btn--danger {
+  background:    linear-gradient(135deg, #ef4444, #dc2626);
+  box-shadow:    0 1px 3px rgb(220 38 38 / 0.3), inset 0 1px 0 rgba(255,255,255,0.12);
+}
+
+.btn--danger:hover {
+  background:    linear-gradient(135deg, #dc2626, #b91c1c);
+  box-shadow:    0 4px 12px rgb(220 38 38 / 0.35);
+  transform:     translateY(-1px);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   9. ALERTS / DISCLAIMERS — slightly warmer info banner
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.alert--info {
+  border-left:   3px solid #0284c7;
+  background:    linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  border-color:  #7dd3fc;
+}
+
+.alert--warning {
+  border-left:   3px solid var(--resq-color-warning);
+  background:    linear-gradient(135deg, #fffbeb, #fef3c7);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   10. STATISTICS DASHBOARD — richer chart blocks and cards
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.stats-chart-block {
+  box-shadow:  0 1px 3px rgb(0 0 0 / 0.06);
+  transition:  box-shadow 200ms ease;
+}
+
+.stats-chart-block:hover {
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.08);
+}
+
+.stats-resolution__item {
+  box-shadow:  0 1px 3px rgb(0 0 0 / 0.05);
+  transition:  box-shadow 200ms ease, transform 200ms ease;
+}
+
+.stats-resolution__item:hover {
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.08);
+  transform:  translateY(-1px);
+}
+
+/* Stat bar fills — slightly taller bars for better readability */
+.stat-bar-track {
+  height:        12px;
+  border-radius: var(--resq-radius-full);
+  background:    #e2e8f0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   11. EMPTY STATES — warmer, less clinical
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.empty-state {
+  background:    linear-gradient(135deg, #ffffff, #f8fafc);
+  border:        1px solid var(--resq-color-border);
+  box-shadow:    0 1px 3px rgb(0 0 0 / 0.04);
+}
+
+.empty-state__icon {
+  background:    linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  box-shadow:    0 2px 8px rgb(0 0 0 / 0.06);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   12. ASSISTANT PANEL — clear confidence indicator styling
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.assistant-panel__input-section {
+  box-shadow:    0 1px 3px rgb(0 0 0 / 0.05);
+  border:        1px solid var(--resq-color-border);
+}
+
+.assistant-result {
+  box-shadow:    0 2px 8px rgb(0 0 0 / 0.06);
+}
+
+/* High confidence — green glow */
+.assistant-confidence--high {
+  box-shadow: 0 0 0 2px rgb(22 163 74 / 0.15);
+}
+
+/* Low confidence — amber glow */
+.assistant-confidence--low {
+  box-shadow: 0 0 0 2px rgb(220 38 38 / 0.12);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   13. QUICKLINK CARDS (Dashboard) — more prominent CTA cards
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.quicklink-card {
+  box-shadow:    0 1px 3px rgb(0 0 0 / 0.06);
+  border:        1px solid var(--resq-color-border);
+  transition:    box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease;
+}
+
+.quicklink-card:hover {
+  box-shadow:    0 8px 24px rgb(0 0 0 / 0.10);
+  transform:     translateY(-2px);
+  border-color:  var(--resq-color-brand-accent);
+}
+
+.quicklink-card__icon {
+  background:    linear-gradient(135deg, #eff6ff, #dbeafe);
+  box-shadow:    0 1px 4px rgb(59 130 246 / 0.12);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   14. STATUS TRACK (Incident Detail stepper) — clearer step indicators
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.status-step--current .status-step__dot {
+  box-shadow:  0 0 0 4px rgba(59,130,246,0.2), 0 0 0 7px rgba(59,130,246,0.08);
+}
+
+.status-step--done .status-step__dot {
+  box-shadow:  0 0 0 2px rgba(22,163,74,0.2);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   15. SCROLL BAR (WebKit) — subtle sidebar scrollbar
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background:    rgba(255,255,255,0.12);
+  border-radius: 4px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.22);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   16. TOAST NOTIFICATIONS — polish with icon backgrounds
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.toast {
+  box-shadow:  0 8px 24px rgb(0 0 0 / 0.14), 0 2px 8px rgb(0 0 0 / 0.08);
+  backdrop-filter: blur(4px);
+}
+
+.toast--success { border-left: 3px solid var(--resq-color-success); }
+.toast--error   { border-left: 3px solid var(--resq-color-error); }
+.toast--warning { border-left: 3px solid var(--resq-color-warning); }
+.toast--info    { border-left: 3px solid var(--resq-color-info); }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   17. TOOLBAR — search icon positioning fix + subtle surface
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.incident-toolbar {
+  background:    var(--resq-color-surface);
+  border:        1px solid var(--resq-color-border);
+  box-shadow:    0 1px 3px rgb(0 0 0 / 0.04);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   18. RESPONSIVE OVERRIDES — ensure no overflow at narrow widths
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 767px) {
+  .summary-card__value {
+    font-size: var(--resq-font-size-3xl);
+  }
+
+  .section-header__title {
+    font-size: var(--resq-font-size-xl);
+  }
+
+  /* Prevent critical pulse from causing reflow on mobile */
+  .incident-card--critical {
+    animation: none;
+    border-left-color: var(--resq-color-critical);
+  }
+
+  .quicklink-card:hover {
+    transform: none;
+  }
+}
+
+@media (max-width: 479px) {
+  .summary-card__value {
+    font-size: var(--resq-font-size-2xl);
+  }
+
+  .btn--primary:hover,
+  .btn--danger:hover {
+    transform: none;  /* no hover lift on touch */
+  }
+}
