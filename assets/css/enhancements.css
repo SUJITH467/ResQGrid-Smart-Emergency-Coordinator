@@ -459,3 +459,1088 @@
     transform: none;  /* no hover lift on touch */
   }
 }
+
+
+/* =============================================================================
+   enhancements.css — Day 2  (Incident Management UX)
+   Sections 19 – 26
+   CSS-only; no JS or data-model changes.
+   ============================================================================= */
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   19. INCIDENT TOOLBAR — improved search field and filter strip
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* Tighter internal gap, ensure wrapping is graceful */
+.incident-toolbar {
+  gap:     var(--resq-space-3);
+  padding: var(--resq-space-4) var(--resq-space-5);
+}
+
+/* Search icon alignment */
+.incident-toolbar__search-icon {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Slightly raised selects — matches input height */
+.incident-toolbar__select {
+  height:    44px;
+  padding:   var(--resq-space-2) var(--resq-space-3);
+  font-size: var(--resq-font-size-sm);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   20. INCIDENT CARDS — priority-tinted top border via :has()
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* High priority — orange left border */
+.incident-card:has(.badge--high) {
+  border-left-color: var(--resq-color-high);
+}
+
+/* Medium priority — amber left border */
+.incident-card:has(.badge--medium) {
+  border-left-color: var(--resq-color-medium);
+}
+
+/* Low priority — blue left border */
+.incident-card:has(.badge--low) {
+  border-left-color: var(--resq-color-low);
+}
+
+/* Resolved card — muted, slightly faded */
+.incident-card:has(.badge--status-resolved) {
+  opacity: 0.75;
+}
+
+.incident-card:has(.badge--status-resolved):hover {
+  opacity: 1;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   21. INCIDENT CARD FOOTER — clearer action row
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.incident-card__footer {
+  padding:         var(--resq-space-3) var(--resq-space-5);
+  justify-content: flex-end;
+  gap:             var(--resq-space-2);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   22. INCIDENT DETAIL — section dividers and tighter density
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* Section heading — left accent stripe */
+.incident-detail__section-heading {
+  position:    relative;
+  padding-left: var(--resq-space-3);
+}
+
+.incident-detail__section-heading::before {
+  content:       '';
+  position:      absolute;
+  left:          0;
+  top:           0;
+  bottom:        0;
+  width:         3px;
+  border-radius: 2px;
+  background:    var(--resq-color-brand-primary);
+}
+
+.incident-detail__section-heading--danger::before {
+  background: var(--resq-color-critical);
+}
+
+/* Meta field label — slightly stronger */
+.incident-detail__field-label {
+  color:         var(--resq-color-text-secondary);
+  font-size:     var(--resq-font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+/* Status track — scrollable with padding */
+.incident-detail__status-track {
+  padding:        var(--resq-space-3) 0 var(--resq-space-1);
+  gap:            0;
+  scrollbar-width: thin;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   23. INCIDENT FORM — better field grouping and grid alignment
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.incident-form {
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.07);
+}
+
+/* Notes textarea — taller default */
+.incident-form .form-textarea {
+  min-height: 100px;
+}
+
+/* Form actions — sticky on long forms */
+.incident-form__actions {
+  position:   sticky;
+  bottom:     0;
+  background: var(--resq-color-surface);
+  z-index:    1;
+  margin-top: var(--resq-space-4);
+  padding:    var(--resq-space-4) 0 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   24. ASSIGNED RESOURCES LIST — tighter chips
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.incident-detail__resource-item {
+  padding:       var(--resq-space-2) var(--resq-space-3);
+  border-radius: var(--resq-radius-md);
+  transition:    background var(--resq-transition-fast);
+}
+
+.incident-detail__resource-item:hover {
+  background: var(--resq-color-info-bg);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   25. INCIDENT EMPTY STATE — friendlier illustration area
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* Reduce excessive padding on narrow screens */
+@media (max-width: 479px) {
+  .empty-state {
+    padding: var(--resq-space-10) var(--resq-space-4);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   26. RESPONSIVE — incident list and detail at narrow widths
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 767px) {
+  /* Single-column form grid */
+  .incident-form__grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Detail grid — single column */
+  .incident-detail__grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Status actions — stack vertically */
+  .incident-detail__status-actions {
+    flex-direction: column;
+    align-items:    stretch;
+  }
+
+  /* Toolbar — stack search above filters */
+  .incident-toolbar {
+    flex-direction: column;
+    align-items:    stretch;
+  }
+
+  .incident-toolbar__search {
+    min-width: unset;
+    width:     100%;
+  }
+
+  .incident-toolbar__filters {
+    width: 100%;
+  }
+
+  .incident-toolbar__select {
+    flex: 1;
+  }
+}
+
+/* =============================================================================
+   enhancements.css — Day 3  (Resource Management UX)
+   Sections 27 – 35
+   CSS-only; no JS or data-model changes.
+   ============================================================================= */
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   27. RESOURCE CARDS — status-tinted left border, hover lift
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.resource-card {
+  transition: box-shadow 200ms ease, transform 200ms ease, border-left-color 200ms ease;
+}
+
+.resource-card--available {
+  border-left-color: var(--resq-color-status-available);
+}
+
+.resource-card--deployed {
+  border-left-color: var(--resq-color-status-deployed);
+  background: linear-gradient(135deg, #ffffff 60%, #eff6ff 100%);
+}
+
+.resource-card--maintenance {
+  border-left-color: var(--resq-color-status-maintenance);
+  background: linear-gradient(135deg, #ffffff 60%, #fefce8 100%);
+  opacity: 0.88;
+}
+
+.resource-card--maintenance:hover {
+  opacity: 1;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   28. RESOURCE SUMMARY STRIP — pill-shaped status counters
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.resource-summary__strip {
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.04);
+  transition: box-shadow 200ms ease;
+}
+
+.resource-summary__strip:hover {
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.07);
+}
+
+/* Each status item — subtle pill background */
+.resource-summary__item {
+  padding:       var(--resq-space-1) var(--resq-space-3);
+  border-radius: var(--resq-radius-full);
+  transition:    background 150ms ease;
+}
+
+.resource-summary__item--available {
+  background: var(--resq-color-status-available-bg);
+  color:      var(--resq-color-status-available);
+}
+
+.resource-summary__item--deployed {
+  background: var(--resq-color-status-deployed-bg);
+  color:      var(--resq-color-status-deployed);
+}
+
+.resource-summary__item--maintenance {
+  background: var(--resq-color-status-maintenance-bg);
+  color:      var(--resq-color-status-maintenance);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   29. RESOURCE TOOLBAR — consistent with incident toolbar style
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* Resource list uses .incident-toolbar class as well; rules from section 19 apply.
+   Add any resource-specific overrides here if needed. */
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   30. ASSIGNMENT PANEL — clearer sections and hover interaction
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* Panel — softer left accent for assigned block */
+.assignment-panel__assigned {
+  border-left: 3px solid var(--resq-color-status-deployed);
+  border-radius: var(--resq-radius-md);
+}
+
+/* Available item — more prominent hover */
+.assignment-panel__available-item {
+  transition: background 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.assignment-panel__available-item:hover {
+  background:   var(--resq-color-info-bg);
+  border-color: var(--resq-color-brand-accent);
+  box-shadow:   0 2px 8px rgb(59 130 246 / 0.1);
+}
+
+/* Header — subtle bottom separator */
+.assignment-panel__header {
+  padding-bottom: var(--resq-space-3);
+  border-bottom:  1px solid var(--resq-color-border);
+  margin-bottom:  var(--resq-space-4);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   31. RESOURCE FORM — consistent with incident form style
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.resource-form {
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.07);
+}
+
+.resource-form__actions {
+  position:   sticky;
+  bottom:     0;
+  background: var(--resq-color-surface);
+  z-index:    1;
+  margin-top: var(--resq-space-4);
+  padding:    var(--resq-space-4) 0 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   32. RESOURCE — empty / no-data states
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* Dashed no-resources placeholder within assignment panel */
+.assignment-panel__no-resources {
+  border:        1px dashed var(--resq-color-border);
+  border-radius: var(--resq-radius-md);
+  color:         var(--resq-color-text-muted);
+  text-align:    center;
+  padding:       var(--resq-space-6) var(--resq-space-4);
+  background:    var(--resq-color-surface-raised);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   33. RESOURCE CARD DANGER (delete) — visual separation
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* Deployed resource delete note */
+.resource-card__no-delete {
+  font-style: italic;
+  color:      var(--resq-color-text-muted);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   34. ACCESSIBILITY — resource list focus and keyboard styles
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* Ensure assignment panel buttons meet 44px touch target */
+.assignment-panel .btn--sm {
+  min-height: 36px;
+}
+
+/* Keyboard focus for resource card interactive zones */
+.resource-card:focus-within {
+  outline: 2px solid var(--resq-color-brand-accent);
+  outline-offset: 2px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   35. RESPONSIVE — resource list and form at narrow widths
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 767px) {
+  /* Single-column resource form */
+  .resource-form__grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Assignment panel filter — stack */
+  .assignment-panel__filter {
+    flex-direction: column;
+    align-items:    stretch;
+  }
+
+  .assignment-panel__select {
+    min-width: unset;
+    width:     100%;
+  }
+
+  /* Summary strip — wrap to two columns */
+  .resource-summary__strip {
+    gap: var(--resq-space-3);
+  }
+}
+
+@media (max-width: 479px) {
+  /* Assignment panel assigned-item — stack name and button */
+  .assignment-panel__assigned-item {
+    flex-direction: column;
+    align-items:    flex-start;
+  }
+
+  /* Resource card header — let name wrap */
+  .resource-card__name {
+    white-space: normal;
+    word-break:  break-word;
+  }
+}
+
+/* =============================================================================
+   enhancements.css — Day 4  (Decision Assistant + Statistics Dashboard)
+   Sections 36 – 48
+   CSS-only; no JS or data-model changes.
+   ============================================================================= */
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   36. ASSISTANT PANEL WRAPPER — surface and spacing
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.assistant-panel {
+  max-width: 820px;
+}
+
+/* Disclaimer — prominent amber banner */
+.assistant-panel__disclaimer {
+  border-left:   4px solid var(--resq-color-warning);
+  border-radius: var(--resq-radius-md);
+  padding:       var(--resq-space-4) var(--resq-space-5);
+  line-height:   var(--resq-line-height-normal);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   37. ASSISTANT INPUT SECTION — improved textarea and helper text
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.assistant-panel__input-section {
+  border-radius: var(--resq-radius-xl);
+  padding:       var(--resq-space-6);
+  box-shadow:    0 2px 8px rgb(0 0 0 / 0.06);
+  border:        1px solid var(--resq-color-border);
+  background:    var(--resq-color-surface);
+  margin-bottom: var(--resq-space-5);
+}
+
+/* Textarea — taller default, clear focus ring */
+.assistant-panel__textarea {
+  min-height:    140px;
+  font-size:     var(--resq-font-size-sm);
+  line-height:   var(--resq-line-height-loose);
+  border-radius: var(--resq-radius-md);
+  resize:        vertical;
+}
+
+.assistant-panel__textarea:focus {
+  border-color: var(--resq-color-brand-accent);
+  box-shadow:   0 0 0 3px rgb(59 130 246 / 0.15);
+  background:   #fafcff;
+}
+
+/* Character count — right-aligned, clearly secondary */
+.assistant-panel__char-count {
+  font-size:      var(--resq-font-size-xs);
+  color:          var(--resq-color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Short-hint warning — visible amber */
+.assistant-panel__short-hint {
+  color:       var(--resq-color-warning);
+  font-weight: var(--resq-font-weight-medium);
+}
+
+/* Action button row — adequate spacing */
+.assistant-panel__input-actions {
+  display:     flex;
+  align-items: center;
+  gap:         var(--resq-space-3);
+  margin-top:  var(--resq-space-4);
+  flex-wrap:   wrap;
+}
+
+/* Analyze button — full-width on very narrow screens */
+@media (max-width: 479px) {
+  .assistant-panel__input-actions {
+    flex-direction: column;
+    align-items:    stretch;
+  }
+
+  .assistant-panel__input-actions .btn {
+    justify-content: center;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   38. ASSISTANT RESULT PANEL — card surface and header
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.assistant-result {
+  border-radius: var(--resq-radius-xl);
+  padding:       var(--resq-space-6);
+  box-shadow:    0 4px 16px rgb(0 0 0 / 0.08), 0 1px 4px rgb(0 0 0 / 0.04);
+  border:        1px solid var(--resq-color-border);
+  background:    var(--resq-color-surface);
+  margin-top:    var(--resq-space-4);
+}
+
+/* Fallback — amber tinted surface */
+.assistant-result--fallback {
+  border-color: var(--resq-color-medium-border);
+  background:   linear-gradient(135deg, #fffbeb 60%, #fef3c7 100%);
+  border-left:  4px solid var(--resq-color-warning);
+}
+
+/* Accepted — green tinted surface */
+.assistant-result--accepted {
+  border-color: #86efac;
+  background:   linear-gradient(135deg, #f0fdf4 60%, #dcfce7 100%);
+  border-left:  4px solid var(--resq-color-status-resolved);
+  box-shadow:   0 2px 8px rgb(22 163 74 / 0.1);
+}
+
+/* Result header — title + confidence badge row */
+.assistant-result__header {
+  padding-bottom: var(--resq-space-4);
+  border-bottom:  1px solid var(--resq-color-border);
+  margin-bottom:  var(--resq-space-4);
+}
+
+.assistant-result--fallback .assistant-result__header {
+  border-bottom-color: var(--resq-color-medium-border);
+}
+
+/* Title */
+.assistant-result__title {
+  font-size:   var(--resq-font-size-lg);
+  font-weight: var(--resq-font-weight-bold);
+  color:       var(--resq-color-text);
+}
+
+.assistant-result--fallback .assistant-result__title {
+  color: #92400e;  /* Amber 800 */
+}
+
+/* Fallback note */
+.assistant-result__fallback-note {
+  margin-bottom: var(--resq-space-4);
+  padding:       var(--resq-space-3) var(--resq-space-4);
+  background:    rgba(245 158 11 / 0.1);
+  border-radius: var(--resq-radius-md);
+  border-left:   3px solid var(--resq-color-warning);
+  font-size:     var(--resq-font-size-sm);
+  color:         #92400e;
+  font-style:    normal;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   39. CONFIDENCE BADGE — clear High / Medium / Low visual differentiation
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.assistant-confidence {
+  padding:       var(--resq-space-1) var(--resq-space-3);
+  border-radius: var(--resq-radius-full);
+  font-size:     var(--resq-font-size-xs);
+  font-weight:   var(--resq-font-weight-semibold);
+  letter-spacing: 0.04em;
+  gap:           var(--resq-space-2);
+}
+
+/* Dots — slightly larger for easier reading */
+.assistant-confidence__dot {
+  width:         9px;
+  height:        9px;
+  border-radius: var(--resq-radius-full);
+}
+
+.assistant-confidence__dot--filled {
+  opacity: 1;
+}
+
+/* High — green glow ring */
+.assistant-confidence--high {
+  box-shadow: 0 0 0 2px rgb(22 163 74 / 0.18);
+}
+
+/* Medium — amber glow ring */
+.assistant-confidence--medium {
+  box-shadow: 0 0 0 2px rgb(245 158 11 / 0.18);
+}
+
+/* Low — red glow ring */
+.assistant-confidence--low {
+  box-shadow: 0 0 0 2px rgb(220 38 38 / 0.15);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   40. SUGGESTION FIELDS — card-style rows for Type, Priority, Resources
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* Field rows — card-like with rounded separator */
+.assistant-result__field {
+  display:       flex;
+  align-items:   flex-start;
+  gap:           var(--resq-space-4);
+  padding:       var(--resq-space-4) var(--resq-space-4);
+  margin:        var(--resq-space-2) 0;
+  border-radius: var(--resq-radius-md);
+  border:        1px solid var(--resq-color-border);
+  background:    var(--resq-color-surface-raised);
+  transition:    background 150ms ease, border-color 150ms ease;
+}
+
+.assistant-result__field:hover {
+  background:   var(--resq-color-info-bg);
+  border-color: var(--resq-color-brand-accent);
+}
+
+/* Remove the old bottom-border style (replaced by card border above) */
+.assistant-result__field {
+  border-bottom: none;
+}
+
+/* Field label column — slightly wider */
+.assistant-result__field-label {
+  min-width:   120px;
+  font-size:   var(--resq-font-size-xs);
+  font-weight: var(--resq-font-weight-semibold);
+  color:       var(--resq-color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding-top: var(--resq-space-1);
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
+/* Field value — badges + edit button */
+.assistant-result__field-value {
+  display:     flex;
+  align-items: center;
+  gap:         var(--resq-space-2);
+  flex-wrap:   wrap;
+  flex:        1;
+}
+
+/* Edit button — ghost, compact */
+.assistant-result__edit-btn {
+  margin-left:  auto;
+  flex-shrink:  0;
+  font-size:    var(--resq-font-size-xs);
+  padding:      var(--resq-space-1) var(--resq-space-3);
+  min-height:   32px;
+  border-radius: var(--resq-radius-md);
+  color:        var(--resq-color-brand-primary);
+  border-color: var(--resq-color-brand-primary);
+  opacity:      0.8;
+  transition:   opacity 150ms ease, background 150ms ease;
+}
+
+.assistant-result__edit-btn:hover {
+  opacity:     1;
+  background:  var(--resq-color-info-bg);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   41. EXPLANATION BLOCK — highlighted reasoning section
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.assistant-result__explanation {
+  margin-top:    var(--resq-space-5);
+  padding:       var(--resq-space-4) var(--resq-space-5);
+  background:    linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border:        1px solid var(--resq-color-border);
+  border-left:   3px solid var(--resq-color-brand-primary);
+  border-radius: var(--resq-radius-md);
+}
+
+.assistant-result__explanation-heading {
+  font-size:   var(--resq-font-size-sm);
+  font-weight: var(--resq-font-weight-semibold);
+  color:       var(--resq-color-text);
+  gap:         var(--resq-space-2);
+  margin-bottom: var(--resq-space-3);
+}
+
+.assistant-result__explanation-text {
+  font-size:   var(--resq-font-size-sm);
+  color:       var(--resq-color-text-secondary);
+  line-height: var(--resq-line-height-loose);
+  margin-bottom: var(--resq-space-3);
+}
+
+/* Keyword chips */
+.assistant-keyword {
+  display:       inline-block;
+  padding:       2px var(--resq-space-2);
+  background:    var(--resq-color-info-bg);
+  color:         var(--resq-color-info);
+  border:        1px solid #7dd3fc;
+  border-radius: var(--resq-radius-sm);
+  font-size:     var(--resq-font-size-xs);
+  font-family:   var(--resq-font-mono);
+  font-weight:   var(--resq-font-weight-medium);
+  transition:    background 150ms ease;
+}
+
+.assistant-keyword:hover {
+  background: #bae6fd;  /* Sky 200 */
+}
+
+/* Keywords row */
+.assistant-result__keywords {
+  display:     flex;
+  align-items: center;
+  gap:         var(--resq-space-2);
+  flex-wrap:   wrap;
+  margin-top:  var(--resq-space-1);
+}
+
+.assistant-result__keywords-label {
+  font-size:   var(--resq-font-size-xs);
+  color:       var(--resq-color-text-muted);
+  font-weight: var(--resq-font-weight-medium);
+  white-space: nowrap;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   42. ASSISTANT RESULT ACTIONS — accept / dismiss row
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.assistant-result__actions {
+  display:     flex;
+  align-items: center;
+  gap:         var(--resq-space-3);
+  margin-top:  var(--resq-space-5);
+  padding-top: var(--resq-space-4);
+  border-top:  1px solid var(--resq-color-border);
+  flex-wrap:   wrap;
+}
+
+/* Accept button — larger hit target, green on accepted result */
+#assistant-accept-btn {
+  min-width: 180px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   43. ACCEPTED STATE — success card
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.assistant-result__accepted-msg {
+  font-size:     var(--resq-font-size-lg);
+  font-weight:   var(--resq-font-weight-semibold);
+  color:         var(--resq-color-success);
+  gap:           var(--resq-space-3);
+  margin-bottom: var(--resq-space-3);
+}
+
+.assistant-result__accepted-sub {
+  font-size:     var(--resq-font-size-sm);
+  color:         var(--resq-color-text-secondary);
+  line-height:   var(--resq-line-height-loose);
+  margin-bottom: var(--resq-space-4);
+  max-width:     480px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   44. STATS TOOLBAR — subtle separator + timestamp style
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.stats-toolbar {
+  padding:         var(--resq-space-3) var(--resq-space-5);
+  background:      var(--resq-color-surface);
+  border:          1px solid var(--resq-color-border);
+  border-radius:   var(--resq-radius-lg);
+  box-shadow:      0 1px 3px rgb(0 0 0 / 0.04);
+  margin-bottom:   var(--resq-space-6);
+}
+
+.stats-toolbar__updated {
+  font-size:   var(--resq-font-size-xs);
+  color:       var(--resq-color-text-muted);
+  font-style:  italic;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   45. STATS SECTION HEADINGS — accent stripe like incident detail
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.stats-section__heading {
+  position:      relative;
+  padding-left:  var(--resq-space-4);
+  font-size:     var(--resq-font-size-xl);
+  font-weight:   var(--resq-font-weight-bold);
+  letter-spacing: -0.01em;
+  color:         var(--resq-color-text);
+  border-bottom: none;
+  margin-bottom: var(--resq-space-5);
+}
+
+.stats-section__heading::before {
+  content:       '';
+  position:      absolute;
+  left:          0;
+  top:           0.1em;
+  bottom:        0.1em;
+  width:         4px;
+  border-radius: 2px;
+  background:    var(--resq-color-brand-primary);
+}
+
+/* Section rule below heading */
+.stats-section__heading::after {
+  content:     '';
+  display:     block;
+  margin-top:  var(--resq-space-3);
+  border-top:  1px solid var(--resq-color-border);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   46. STATS CHART BLOCKS — richer card surface
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.stats-chart-block {
+  border-radius: var(--resq-radius-xl);
+  padding:       var(--resq-space-5) var(--resq-space-6);
+  box-shadow:    0 1px 4px rgb(0 0 0 / 0.06);
+  transition:    box-shadow 200ms ease, transform 200ms ease;
+}
+
+.stats-chart-block:hover {
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.09);
+  transform:  translateY(-1px);
+}
+
+/* Chart block title — accent underline */
+.stats-chart-block__title {
+  font-size:     var(--resq-font-size-sm);
+  font-weight:   var(--resq-font-weight-semibold);
+  color:         var(--resq-color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding-bottom: var(--resq-space-3);
+  border-bottom:  2px solid var(--resq-color-border);
+  margin-bottom:  var(--resq-space-4);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   47. STAT TABLE ROWS — alternating zebra, taller bars
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* Zebra striping for readability */
+.stat-table tbody tr:nth-child(even) {
+  background: var(--resq-color-surface-raised);
+}
+
+/* Row hover — highlight */
+.stat-table tbody tr {
+  transition: background 100ms ease;
+}
+
+.stat-table tbody tr:hover {
+  background: var(--resq-color-info-bg);
+}
+
+/* Taller bar track for better visual weight */
+.stat-bar-track {
+  height:     14px;
+  background: #e2e8f0;
+}
+
+/* Bar fill — smooth animated entry on paint */
+.stat-bar-fill {
+  transition: width 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Table footer total row */
+.stat-table tfoot tr {
+  background: var(--resq-color-surface-raised);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   48. RESOLUTION TIME CARDS + STATS EMPTY STATES
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* Resolution grid — equal-height cards */
+.stats-resolution__grid {
+  display:               grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:                   var(--resq-space-5);
+  align-items:           stretch;
+}
+
+.stats-resolution__item {
+  border-radius: var(--resq-radius-xl);
+  padding:       var(--resq-space-6);
+  box-shadow:    0 2px 8px rgb(0 0 0 / 0.07);
+  transition:    box-shadow 200ms ease, transform 200ms ease;
+  gap:           var(--resq-space-3);
+}
+
+.stats-resolution__item:hover {
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.1);
+  transform:  translateY(-2px);
+}
+
+/* Label */
+.stats-resolution__label {
+  font-size:      var(--resq-font-size-xs);
+  font-weight:    var(--resq-font-weight-semibold);
+  color:          var(--resq-color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Value — big and bold */
+.stats-resolution__value {
+  font-size:   var(--resq-font-size-3xl);
+  font-weight: var(--resq-font-weight-bold);
+  color:       var(--resq-color-text);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.stats-resolution__value--fast { color: var(--resq-color-status-resolved); }
+.stats-resolution__value--slow { color: var(--resq-color-warning); }
+
+/* Empty — warmer dashed box */
+.stats-empty {
+  background:    linear-gradient(135deg, #ffffff, #f8fafc);
+  border:        1px dashed var(--resq-color-border);
+  border-radius: var(--resq-radius-xl);
+  padding:       var(--resq-space-10) var(--resq-space-6);
+}
+
+.stats-empty__message {
+  font-size:   var(--resq-font-size-sm);
+  color:       var(--resq-color-text-muted);
+  line-height: var(--resq-line-height-loose);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   49. RESPONSIVE — assistant and stats at narrow widths
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* — 768px: tablet layout — */
+@media (max-width: 767px) {
+  /* Stats summary cards — 2 columns */
+  .summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Charts grid — single column */
+  .stats-charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Resolution grid — single column */
+  .stats-resolution__grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Assistant result field — stack label above value */
+  .assistant-result__field {
+    flex-direction: column;
+    gap:            var(--resq-space-2);
+  }
+
+  .assistant-result__field-label {
+    min-width:   unset;
+    padding-top: 0;
+  }
+
+  .assistant-result__edit-btn {
+    margin-left: 0;
+  }
+
+  /* Stats toolbar — stack */
+  .stats-toolbar {
+    flex-direction: column;
+    align-items:    flex-start;
+    gap:            var(--resq-space-2);
+  }
+}
+
+/* — 479px: phone layout — */
+@media (max-width: 479px) {
+  /* Stats summary cards — single column */
+  .summary-cards {
+    grid-template-columns: 1fr;
+  }
+
+  /* Resolution value — smaller on tiny screens */
+  .stats-resolution__value {
+    font-size: var(--resq-font-size-2xl);
+  }
+
+  /* Hide bar chart % column on very small screens to prevent overflow */
+  .stat-table__pct {
+    display: none;
+  }
+
+  /* Ensure stat table doesn't overflow container */
+  .stat-table {
+    font-size: var(--resq-font-size-xs);
+  }
+
+  .stat-table__label {
+    min-width: 80px;
+  }
+
+  /* Assistant result actions — stack */
+  .assistant-result__actions {
+    flex-direction: column;
+    align-items:    stretch;
+  }
+
+  .assistant-result__actions .btn {
+    justify-content: center;
+    min-width:       unset;
+  }
+}
+
+/* — 375px / 320px: very small phones — */
+@media (max-width: 374px) {
+  /* Stat table — hide count column too, keep label + bar */
+  .stat-table__count {
+    display: none;
+  }
+
+  /* Chart blocks — minimal padding */
+  .stats-chart-block {
+    padding: var(--resq-space-3) var(--resq-space-4);
+  }
+
+  /* Resolution item — compact */
+  .stats-resolution__item {
+    padding: var(--resq-space-4);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   50. ACCESSIBILITY — focus indicators for assistant and stats
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* Visible focus for assistant analyze button */
+#assistant-analyze-btn:focus-visible,
+#assistant-clear-btn:focus-visible,
+#assistant-accept-btn:focus-visible,
+#assistant-dismiss-btn:focus-visible {
+  outline:        2px solid var(--resq-color-brand-accent);
+  outline-offset: 3px;
+  box-shadow:     0 0 0 5px rgb(59 130 246 / 0.15);
+}
+
+/* Stats refresh button focus */
+#stats-refresh-btn:focus-visible {
+  outline:        2px solid var(--resq-color-brand-accent);
+  outline-offset: 3px;
+}
+
+/* Result heading — receives programmatic focus after analysis */
+#assistant-result-heading:focus {
+  outline: none;  /* visual focus not needed on heading; announced by aria-live */
+}
+
+/* Resource check inputs in edit panel */
+.assistant-resource-check input[type="checkbox"]:focus-visible {
+  outline:        2px solid var(--resq-color-brand-accent);
+  outline-offset: 2px;
+}
+
+/* Stats links (empty state) */
+.stats-empty__link:focus-visible {
+  outline:        2px solid var(--resq-color-brand-accent);
+  outline-offset: 2px;
+  border-radius:  var(--resq-radius-sm);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   51. PREFERS-REDUCED-MOTION — disable transitions / animations
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  .stat-bar-fill {
+    transition: none;
+  }
+
+  .stats-chart-block,
+  .stats-resolution__item,
+  .assistant-result {
+    transition: none;
+  }
+
+  .stats-chart-block:hover,
+  .stats-resolution__item:hover {
+    transform: none;
+  }
+}
