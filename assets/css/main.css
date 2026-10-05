@@ -436,17 +436,6 @@ a {
   gap:         var(--resq-space-3);
 }
 
-.topbar__prototype-label {
-  font-size:   var(--resq-font-size-xs);
-  font-weight: var(--resq-font-weight-semibold);
-  color:       var(--resq-color-warning);
-  background:  var(--resq-color-warning-bg);
-  padding:     var(--resq-space-1) var(--resq-space-3);
-  border-radius: var(--resq-radius-full);
-  border:      1px solid var(--resq-color-medium-border);
-  white-space: nowrap;
-}
-
 /* ── Main content area ───────────────────────────────────────────────────────── */
 .main-content {
   margin-left:  var(--resq-sidebar-width);

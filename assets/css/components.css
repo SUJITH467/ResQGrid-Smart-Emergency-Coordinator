@@ -126,13 +126,6 @@
   letter-spacing: 0.04em;
 }
 
-/* Prototype label */
-.badge--prototype {
-  background: var(--resq-color-warning-bg);
-  color:      var(--resq-color-warning);
-  border:     1px solid var(--resq-color-medium-border);
-}
-
 /* Priority badges */
 .badge--critical {
   background: var(--resq-color-critical-bg);
@@ -609,12 +602,6 @@
 .form-hint {
   font-size: var(--resq-font-size-xs);
   color:     var(--resq-color-text-muted);
-}
-
-/* ── Prototype disclaimer ─────────────────────────────────────────────────────── */
-.prototype-disclaimer {
-  font-size:     var(--resq-font-size-sm);
-  margin-bottom: var(--resq-space-6);
 }
 
 /* ── Divider ─────────────────────────────────────────────────────────────────── */
@@ -1475,10 +1462,6 @@
 /* ── Assistant panel wrapper ─────────────────────────────────────────────────── */
 .assistant-panel {
   max-width: 800px;
-}
-
-.assistant-panel__disclaimer {
-  margin-bottom: var(--resq-space-6);
 }
 
 /* ── Input section ───────────────────────────────────────────────────────────── */

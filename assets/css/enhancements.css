@@ -80,16 +80,6 @@
   box-shadow:    0 1px 4px rgb(0 0 0 / 0.05);
 }
 
-/* Emergency prototype badge — more prominent */
-.topbar__prototype-label {
-  background:    linear-gradient(135deg, #fef3c7, #fde68a);
-  color:         #92400e;  /* Amber 800 */
-  border-color:  #fcd34d;
-  font-weight:   var(--resq-font-weight-semibold);
-  letter-spacing: 0.03em;
-  box-shadow:    0 1px 3px rgb(0 0 0 / 0.08);
-}
-
 /* ══════════════════════════════════════════════════════════════════════════════
    3. SUMMARY CARDS — deeper shadows, richer left borders, hover lift
    ══════════════════════════════════════════════════════════════════════════════ */
@@ -871,14 +861,6 @@
   max-width: 820px;
 }
 
-/* Disclaimer — prominent amber banner */
-.assistant-panel__disclaimer {
-  border-left:   4px solid var(--resq-color-warning);
-  border-radius: var(--resq-radius-md);
-  padding:       var(--resq-space-4) var(--resq-space-5);
-  line-height:   var(--resq-line-height-normal);
-}
-
 /* ══════════════════════════════════════════════════════════════════════════════
    37. ASSISTANT INPUT SECTION — improved textarea and helper text
    ══════════════════════════════════════════════════════════════════════════════ */
@@ -1330,12 +1312,21 @@
    48. RESOLUTION TIME CARDS + STATS EMPTY STATES
    ══════════════════════════════════════════════════════════════════════════════ */
 
-/* Resolution grid — equal-height cards */
+/* Resolution grid — equal-height cards.
+   Column count is left to responsive.css breakpoints; we only add
+   gap, align-items and the larger gap value here. */
 .stats-resolution__grid {
-  display:               grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap:                   var(--resq-space-5);
-  align-items:           stretch;
+  gap:          var(--resq-space-5);
+  align-items:  stretch;
+}
+
+/* On large screens (≥ 1024px) enforce three equal columns explicitly
+   so align-items:stretch takes full effect. Smaller viewports defer
+   to responsive.css (2-col at ≤1023px, 1-col at ≤767px). */
+@media (min-width: 1024px) {
+  .stats-resolution__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .stats-resolution__item {
@@ -1542,5 +1533,141 @@
   .stats-chart-block:hover,
   .stats-resolution__item:hover {
     transform: none;
+  }
+}
+
+/* =============================================================================
+   52. STATISTICS TABLE COLUMN ALIGNMENT FIX
+   ─────────────────────────────────────────
+   Problem:  table-layout:auto (browser default) sizes each table's columns
+   independently from its own content. "Natural Disaster" in By Type makes
+   that table's CATEGORY column wider than By Priority or By Status, so COUNT,
+   % and the DISTRIBUTION bar start at different horizontal positions in each
+   card.
+
+   Fix:  table-layout:fixed forces a single consistent column algorithm across
+   every .stat-table instance. Column widths are locked via explicit values on
+   the four <th> selectors and their matching <td> class names. CATEGORY takes
+   all remaining space; COUNT, %, and DISTRIBUTION are fixed-width so every bar
+   starts and ends at exactly the same horizontal position within its card.
+
+   Desktop column proportions (inside a ~280-400px chart card):
+     CATEGORY    — flexible remainder  (min 0, no nowrap so long names wrap)
+     COUNT       — 44px  right-aligned
+     %           — 44px  right-aligned
+     DISTRIBUTION— 120px fixed
+   ============================================================================= */
+
+/* ── 1. Switch to fixed layout ───────────────────────────────────────────────── */
+.stat-table {
+  table-layout: fixed;
+  width:        100%;
+}
+
+/* ── 2. Lock header column widths (drives the fixed layout algorithm) ────────── */
+.stat-table thead th:nth-child(1) { width: auto;   }   /* CATEGORY  — fills remainder */
+.stat-table thead th:nth-child(2) { width: 44px;   }   /* COUNT     — fixed */
+.stat-table thead th:nth-child(3) { width: 44px;   }   /* %         — fixed */
+.stat-table thead th:nth-child(4) { width: 120px;  }   /* DIST.     — fixed */
+
+/* ── 3. CATEGORY cell — override the components.css min-width:120px / nowrap ─── */
+.stat-table__label {
+  min-width:     0;         /* let fixed layout control width, not content */
+  white-space:   normal;    /* long names (Natural Disaster, Hazmat Team) wrap */
+  word-break:    break-word;
+  overflow:      hidden;
+  padding-right: var(--resq-space-2);
+}
+
+/* ── 4. COUNT cell — fixed width, right-aligned ─────────────────────────────── */
+.stat-table__count {
+  width:         44px;
+  min-width:     44px;
+  text-align:    right;
+  padding-right: var(--resq-space-2);
+  white-space:   nowrap;
+}
+
+/* ── 5. % cell — fixed width, right-aligned ─────────────────────────────────── */
+.stat-table__pct {
+  width:         44px;
+  min-width:     44px;
+  text-align:    right;
+  padding-right: var(--resq-space-2);
+  white-space:   nowrap;
+}
+
+/* ── 6. DISTRIBUTION cell — fixed width so bars are always the same length ───── */
+.stat-table__bar {
+  width:        120px;
+  min-width:    120px;
+  max-width:    120px;
+  padding-left: var(--resq-space-2);
+}
+
+/* Bar track fills the fixed cell completely */
+.stat-table__bar .stat-bar-track {
+  width: 100%;
+}
+
+/* ── 7. Footer total row — mirror the same column widths ────────────────────── */
+.stat-table__total-label {
+  /* inherits CATEGORY — no width needed */
+  padding-right: var(--resq-space-2);
+}
+
+.stat-table__total-count {
+  width:         44px;
+  min-width:     44px;
+  text-align:    right;
+  padding-right: var(--resq-space-2);
+  white-space:   nowrap;
+}
+
+/* Empty pct and bar cells in footer */
+.stat-table tfoot tr td:nth-child(3) { width: 44px;  min-width: 44px;  }
+.stat-table tfoot tr td:nth-child(4) { width: 120px; min-width: 120px; }
+
+/* ── 8. Consistent card padding so all chart blocks share identical box geometry */
+.stats-chart-block {
+  padding:    var(--resq-space-5);
+  box-sizing: border-box;
+}
+
+/* ── 9. Wider bar on tablet — cards are full-width, so we have room ─────────── */
+@media (min-width: 481px) and (max-width: 767px) {
+  .stat-table thead th:nth-child(4),
+  .stat-table__bar {
+    width:     160px;
+    min-width: 160px;
+    max-width: 160px;
+  }
+
+  .stat-table__total-count,
+  .stat-table tfoot tr td:nth-child(3),
+  .stat-table tfoot tr td:nth-child(4) {
+    min-width: unset;
+  }
+
+  .stat-table tfoot tr td:nth-child(4) {
+    width:     160px;
+    min-width: 160px;
+  }
+}
+
+/* ── 10. Mobile (≤ 767px) — responsive.css already flips the table to
+         display:block stacked rows, so table-layout:fixed is irrelevant.
+         Restore label to natural block width just in case. ──────────────────── */
+@media (max-width: 767px) {
+  .stat-table {
+    table-layout: auto;  /* irrelevant once display:block, but explicit */
+  }
+
+  .stat-table__label {
+    min-width:   0;
+    white-space: normal;
+    word-break:  break-word;
+    max-width:   none;
+    overflow:    visible;
   }
 }

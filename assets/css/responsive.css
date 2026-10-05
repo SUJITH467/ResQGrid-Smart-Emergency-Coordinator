@@ -118,11 +118,6 @@
     left:      var(--resq-space-4);
     max-width: 100%;
   }
-
-  /* Topbar: hide prototype label on very small screens */
-  .topbar__prototype-label {
-    display: none;
-  }
 }
 
 /* ── Below 480px (small mobile) ─────────────────────────────────────────────── */

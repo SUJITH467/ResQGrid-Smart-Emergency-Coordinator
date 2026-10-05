@@ -75,9 +75,7 @@ function renderIncidents(el) {
         <h1 class="section-header__title">Incidents</h1>
         <p class="section-header__subtitle">Report and manage emergency incidents</p>
       </div>
-      <span class="badge badge--prototype">Educational Prototype</span>
     </div>
-    ${buildPrototypeDisclaimer()}
     <div id="incidents-pane"></div>
   `;
   showListView(el);
@@ -152,9 +150,7 @@ function renderResourcesSection(el) {
         <h1 class="section-header__title">Resources</h1>
         <p class="section-header__subtitle">Manage and deploy emergency resources</p>
       </div>
-      <span class="badge badge--prototype">Educational Prototype</span>
     </div>
-    ${buildPrototypeDisclaimer()}
     <div id="resources-pane"></div>
   `;
   showResourceListView(el);
@@ -239,10 +235,7 @@ function renderDashboard(el) {
         <h1 class="section-header__title">Dashboard</h1>
         <p class="section-header__subtitle">Operational overview of ResQGrid</p>
       </div>
-      <span class="badge badge--prototype">Educational Prototype</span>
     </div>
-
-    ${buildPrototypeDisclaimer()}
 
     <div class="summary-cards" role="list" aria-label="Summary metrics">
 
@@ -409,7 +402,6 @@ function renderAssistant(el) {
         <h1 class="section-header__title">Decision-Support Assistant</h1>
         <p class="section-header__subtitle">Rule-based incident classification — not AI</p>
       </div>
-      <span class="badge badge--prototype">Prototype — Not AI</span>
     </div>
     <div id="assistant-panel-mount"></div>
   `;
@@ -441,9 +433,7 @@ function renderStats(el) {
         <h1 class="section-header__title">Statistics</h1>
         <p class="section-header__subtitle">Response performance and operational metrics</p>
       </div>
-      <span class="badge badge--prototype">Educational Prototype</span>
     </div>
-    ${buildPrototypeDisclaimer()}
     <div id="stats-view-mount"></div>
   `;
 
@@ -452,22 +442,6 @@ function renderStats(el) {
 }
 
 // ── Shared helpers ─────────────────────────────────────────────────────────
-
-function buildPrototypeDisclaimer() {
-  return `
-    <div class="alert alert--info prototype-disclaimer" role="note">
-      <svg class="alert__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2" aria-hidden="true">
-        <circle cx="12" cy="12" r="10"/>
-        <line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-      </svg>
-      <span>
-        <strong>Educational Prototype</strong> — ResQGrid is for learning purposes only.
-        Do not use in real emergencies. Always follow official emergency procedures.
-      </span>
-    </div>
-  `;
-}
 
 function showStorageWarningBanner() {
   const banner = document.getElementById('storage-warning-banner');
