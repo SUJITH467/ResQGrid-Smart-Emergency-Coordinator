@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Run Tests on Service File Save",
+      "trigger": "PostFileSave",
+      "description": "Automatically runs the incident-service and production-modules test suites whenever a service JS file is saved, giving immediate feedback on regressions without leaving the editor.",
+      "matcher": "assets/js/services/.*\\.js$",
+      "action": {
+        "type": "command",
+        "command": "cd /d \"C:\\Project\\ResQGrid-Smart-Emergency-Coordinator\" && node --require ./test-globals-preload.cjs test-incident-service.mjs 2>nul | findstr /C:\"Passed:\" /C:\"Failed:\" /C:\"✓ All\" /C:\"✗\" && node --require ./test-globals-preload.cjs test-production-modules.mjs 2>nul | findstr /C:\"Passed:\" /C:\"Failed:\" /C:\"✓ All\" /C:\"✗\"",
+        "timeout": 60
+      }
+    }
+  ]
+}

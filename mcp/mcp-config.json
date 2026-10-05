@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "resqgrid": {
+      "command": "node",
+      "args": ["mcp/resqgrid-mcp-server.mjs"],
+      "disabled": false,
+      "description": "ResQGrid local MCP server — exposes get_incidents, get_resources, validate_consistency, get_statistics, and run_tests tools."
+    }
+  }
+}
