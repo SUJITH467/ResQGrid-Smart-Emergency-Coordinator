@@ -318,7 +318,7 @@ function renderDashboard(el) {
         </div>
         <div class="summary-card__value">N/A</div>
         <div class="summary-card__label">Avg. Resolution Time</div>
-        <div class="summary-card__sub">coming in Phase 5</div>
+        <div class="summary-card__sub">see Statistics for details</div>
       </article>
 
       <article class="summary-card" role="listitem" aria-label="${total} Total Incidents">
