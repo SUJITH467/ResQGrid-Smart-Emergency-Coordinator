@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "resqgrid": {
+      "command": "node",
+      "args": ["mcp/resqgrid-mcp-server.mjs"],
+      "disabled": false,
+      "autoApprove": ["get_incidents", "get_resources", "validate_consistency", "get_statistics", "run_tests"]
+    }
+  }
+}
